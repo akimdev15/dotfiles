@@ -53,7 +53,8 @@ backup_and_link "$DOTFILES/nvim"                "$HOME/.config/nvim"
 backup_and_link "$DOTFILES/tmux.conf"           "$HOME/.tmux.conf"
 
 echo "==> Hiding native macOS menu bar (sketchybar replaces it)..."
-defaults write NSGlobalDomain _HIHideMenuBar -bool true
+defaults write com.apple.dock autohide-menubar -bool true
+killall Dock
 
 echo "==> Starting services..."
 
