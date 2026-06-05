@@ -55,8 +55,12 @@ echo "==> Making scripts executable..."
 chmod +x "$DOTFILES/scripts/cheatsheet"
 
 echo "==> Starting services..."
-brew services restart sketchybar
-brew services restart borders
+brew services list | grep -q "sketchybar.*started" \
+  && echo "  sketchybar already running" \
+  || brew services start sketchybar
+brew services list | grep -q "borders.*started" \
+  && echo "  borders already running" \
+  || brew services start borders
 open -a AeroSpace 2>/dev/null || true
 
 echo ""
