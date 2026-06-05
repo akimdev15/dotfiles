@@ -18,6 +18,7 @@ brew install FelixKratz/formulae/borders
 brew install neovim
 brew install tmux
 brew install navi
+brew install pgformatter   # `pg_format` — SQL formatter for Postgres
 
 if ! brew list --cask font-sketchybar-app-font &>/dev/null; then
   brew install --cask font-sketchybar-app-font
@@ -66,8 +67,8 @@ echo "  1. System Settings → Desktop & Dock → Menu Bar"
 echo "     → 'Automatically hide and show the menu bar' → Always"
 echo "  2. Grant Accessibility: System Settings → Privacy & Security → Accessibility → AeroSpace"
 echo "  3. Reload AeroSpace: Alt-Shift-; then Esc"
-echo "  4. Install Neovim plugins: open nvim, run :Lazy sync"
-echo "  5. Install Neovim LSP servers: :MasonInstall lua-language-server jdtls pyright"
-echo "  6. Authorize GitHub Copilot: :Copilot auth"
+echo "  4. Open nvim — plugins auto-install via lazy.nvim,"
+echo "     LSP servers + formatters auto-install via mason-tool-installer"
+echo "  5. Authorize GitHub Copilot: :Copilot auth"
 echo ""
 echo "Cheatsheet popup: prefix+? (inside tmux)"

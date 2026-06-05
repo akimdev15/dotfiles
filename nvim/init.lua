@@ -35,7 +35,9 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   { import = 'plugins.ui' },       -- colorscheme, statusline
   { import = 'plugins.editor' },   -- telescope, treesitter, comments
-  { import = 'plugins.lsp' },      -- LSP, Mason, nvim-cmp, conform
+  { import = 'plugins.lsp' },      -- LSP, Mason, nvim-cmp
+  { import = 'plugins.java' },     -- Java LSP via nvim-jdtls
+  { import = 'plugins.format' },   -- conform.nvim — format on save
   { import = 'plugins.tools' },    -- neo-tree, tmux-navigator
   { import = 'plugins.leetcode' }, -- LeetCode + Obsidian vault integration
   { import = 'plugins.copilot' }, -- GitHub Copilot ghost-text (comment out to remove)

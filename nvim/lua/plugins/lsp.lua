@@ -22,6 +22,32 @@ return {
     },
   },
 
+  -- Auto-installs Mason tools on startup so a fresh clone has everything ready.
+  {
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    dependencies = { 'williamboman/mason.nvim' },
+    event = 'VeryLazy',
+    opts = {
+      run_on_start = true,
+      ensure_installed = {
+        -- LSP servers
+        'jdtls',           -- Java
+        'pyright',         -- Python
+        'typescript-language-server',
+        'lua-language-server',
+
+        -- Formatters
+        'stylua',          -- Lua
+        'ruff',            -- Python (ruff_format)
+        'prettier',        -- JS/TS/JSON/CSS/MD/YAML
+        'google-java-format',
+        'goimports',       -- Go
+        'golines',         -- Go line wrap
+        -- Note: pg_format installed via Homebrew (see dotfiles/init_setup.sh)
+      },
+    },
+  },
+
   -- --------------------------------------------------------------------------
   -- Core LSP configuration
   -- --------------------------------------------------------------------------
@@ -132,27 +158,7 @@ return {
   },
 
   -- --------------------------------------------------------------------------
-  -- Conform — format on save
-  -- Add formatters_by_ft entries for any language you need.
-  -- --------------------------------------------------------------------------
-  {
-    'stevearc/conform.nvim',
-    opts = {
-      notify_on_error = false,
-      format_on_save  = {
-        timeout_ms   = 500,
-        lsp_fallback = true,
-      },
-      formatters_by_ft = {
-        lua    = { 'stylua' },
-        python = { 'ruff_format' },
-        -- go  = { 'goimports', 'gofmt' },
-        -- javascript = { 'prettier' },
-        -- typescript = { 'prettier' },
-      },
-    },
-  },
-
+  -- (conform.nvim moved to plugins/format.lua)
   -- --------------------------------------------------------------------------
   -- nvim-cmp — autocompletion engine
   -- --------------------------------------------------------------------------
