@@ -16,6 +16,8 @@ fi
 brew install --cask nikitabobko/tap/aerospace
 brew install felixkratz/formulae/sketchybar
 brew install FelixKratz/formulae/borders
+brew install neovim
+brew install tmux
 
 # sketchybar app font for icons
 if ! fc-list 2>/dev/null | grep -qi "sketchybar"; then
@@ -47,6 +49,8 @@ backup_and_link() {
 backup_and_link "$DOTFILES/aerospace.toml"     "$HOME/.aerospace.toml"
 backup_and_link "$DOTFILES/sketchybar"          "$HOME/.config/sketchybar"
 backup_and_link "$DOTFILES/bordersrc"           "$HOME/.config/borders/bordersrc"
+backup_and_link "$DOTFILES/nvim"                "$HOME/.config/nvim"
+backup_and_link "$DOTFILES/tmux.conf"           "$HOME/.tmux.conf"
 
 echo "==> Starting services..."
 
