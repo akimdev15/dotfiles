@@ -13,7 +13,6 @@ macOS developer environment: AeroSpace + Sketchybar + Neovim + tmux + navi cheat
 | `tmux/tmux.conf` | `~/.tmux.conf` | Terminal multiplexer |
 | `navi/` | `~/.config/navi/` | Cheatsheet tool config |
 | `cheatsheets/` | referenced by navi | Keybinding cheat sheets |
-| `scripts/cheatsheet` | — | Popup launcher script |
 
 ---
 
@@ -197,10 +196,9 @@ Config at `tmux/tmux.conf`. Prefix: `Ctrl-Space`.
 
 **Opening the popup:**
 
-| Method | Trigger | Works from |
-|---|---|---|
-| AeroSpace hotkey | `Alt-Shift-Space` | Anywhere on macOS |
-| tmux popup | `prefix + ?` | Inside any tmux session |
+| Method | Trigger |
+|---|---|
+| tmux popup | `prefix + ?` |
 
 **Inside navi:**
 - Type to fuzzy-search descriptions

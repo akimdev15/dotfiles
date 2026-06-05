@@ -51,9 +51,6 @@ backup_and_link "$DOTFILES/nvim"                     "$HOME/.config/nvim"
 backup_and_link "$DOTFILES/tmux/tmux.conf"           "$HOME/.tmux.conf"
 backup_and_link "$DOTFILES/navi"                     "$HOME/.config/navi"
 
-echo "==> Making scripts executable..."
-chmod +x "$DOTFILES/scripts/cheatsheet"
-
 echo "==> Starting services..."
 brew services list | grep -q "sketchybar.*started" \
   && echo "  sketchybar already running" \
@@ -73,4 +70,4 @@ echo "  4. Install Neovim plugins: open nvim, run :Lazy sync"
 echo "  5. Install Neovim LSP servers: :MasonInstall lua-language-server jdtls pyright"
 echo "  6. Authorize GitHub Copilot: :Copilot auth"
 echo ""
-echo "Cheatsheet popup: Alt-Shift-Space (anywhere) or prefix+? (inside tmux)"
+echo "Cheatsheet popup: prefix+? (inside tmux)"
