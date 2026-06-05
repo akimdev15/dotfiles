@@ -1,0 +1,92 @@
+% tmux, sessions
+
+# New named session
+tmux new-session -s <name>
+
+# List sessions
+tmux ls
+
+# Attach to session
+tmux attach -t <name>
+
+# Kill session
+tmux kill-session -t <name>
+
+% tmux, prefix keys
+; prefix = Ctrl-Space
+
+# Reload config
+prefix + r
+
+# Scratch popup toggle (open)
+prefix + t
+
+# Close scratch (when inside scratch session)
+Ctrl-t
+
+% tmux, windows
+
+# Previous window
+Alt-H
+
+# Next window
+Alt-L
+
+# New window
+prefix + c
+
+# Rename window
+prefix + ,
+
+# Kill window
+prefix + &
+
+% tmux, panes
+
+# Split horizontal (current dir)
+prefix + "
+
+# Split vertical (current dir)
+prefix + %
+
+# Focus pane left
+Ctrl-h
+
+# Focus pane down
+Ctrl-j
+
+# Focus pane up
+Ctrl-k
+
+# Focus pane right
+Ctrl-l
+
+# Resize pane left (repeat)
+prefix + H
+
+# Resize pane down (repeat)
+prefix + J
+
+# Resize pane up (repeat)
+prefix + K
+
+# Resize pane right (repeat)
+prefix + L
+
+# Kill pane
+prefix + x
+
+% tmux, copy mode
+; mode-keys vi
+
+# Enter copy mode
+prefix + [
+
+# Start selection
+v
+
+# Copy selection (to clipboard)
+y
+
+# Paste
+prefix + ]

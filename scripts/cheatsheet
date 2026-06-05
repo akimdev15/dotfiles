@@ -1,0 +1,2 @@
+#!/bin/bash
+navi --path "$HOME/dotfiles/cheatsheets"

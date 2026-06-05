@@ -1,0 +1,130 @@
+% aerospace, focus
+
+# Focus window left (wraps monitors)
+Alt-h
+
+# Focus window down (wraps monitors)
+Alt-j
+
+# Focus window up (wraps monitors)
+Alt-k
+
+# Focus window right (wraps monitors)
+Alt-l
+
+% aerospace, move
+
+# Move window left
+Alt-Shift-h
+
+# Move window down
+Alt-Shift-j
+
+# Move window up
+Alt-Shift-k
+
+# Move window right
+Alt-Shift-l
+
+# Join with left
+Alt-Shift-left
+
+# Join with down
+Alt-Shift-down
+
+# Join with up
+Alt-Shift-up
+
+# Join with right
+Alt-Shift-right
+
+% aerospace, layout
+
+# Toggle floating / tiling
+Alt-Ctrl-f
+
+# Fullscreen
+Alt-Ctrl-Shift-f
+
+# Layout: tiles horizontal/vertical
+Alt-/
+
+# Layout: accordion horizontal/vertical
+Alt-,
+
+# Resize smart smaller
+Alt-Shift--
+
+# Resize smart larger
+Alt-Shift-=
+
+% aerospace, workspaces
+
+# Switch to workspace 1-9
+Alt-1  through  Alt-9
+
+# Move window to workspace 1-9 (follows)
+Alt-Shift-1  through  Alt-Shift-9
+
+# Toggle last workspace
+Alt-Tab
+
+# Move workspace to next monitor
+Alt-Shift-Tab
+
+% aerospace, monitors
+
+# Move window to right monitor
+Alt-Ctrl-right
+
+# Move window to left monitor
+Alt-Ctrl-left
+
+# Move window to upper monitor
+Alt-Ctrl-up
+
+# Move window to lower monitor
+Alt-Ctrl-down
+
+% aerospace, apps
+
+# Open Ghostty
+Alt-g
+
+# Open Obsidian
+Alt-o
+
+# Open Finder
+Alt-f
+
+# Open IntelliJ IDEA
+Alt-i
+
+# Open Brave Browser
+Alt-b
+
+# Open VS Code
+Alt-v
+
+# Open cheatsheet popup
+Alt-Shift-Space
+
+% aerospace, modes
+
+# Enter service mode
+Alt-Shift-;
+
+# In service mode: reload config
+esc  (then reload)  or  r
+
+# In service mode: flatten workspace tree
+r
+
+# In service mode: toggle float
+f
+
+# In service mode: close all but current
+backspace
+
+# Enter apps mode
+Alt-Shift-Enter

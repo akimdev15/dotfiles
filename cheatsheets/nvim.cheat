@@ -1,0 +1,194 @@
+% nvim, navigation
+
+# Focus window left (or tmux pane)
+Ctrl-h
+
+# Focus window down (or tmux pane)
+Ctrl-j
+
+# Focus window up (or tmux pane)
+Ctrl-k
+
+# Focus window right (or tmux pane)
+Ctrl-l
+
+# Clear search highlight
+Esc
+
+# Exit terminal mode
+Esc Esc
+
+% nvim, lsp
+
+# Go to definition
+gd
+
+# Go to references
+gr
+
+# Go to implementation
+gI
+
+# Go to declaration
+gD
+
+# Type definition
+<leader>D
+
+# Rename symbol
+<leader>rn
+
+# Code action
+<leader>ca
+
+# Signature help
+Ctrl-s
+
+# Show line diagnostics
+gl
+
+# Previous diagnostic
+[d
+
+# Next diagnostic
+]d
+
+# Open diagnostic quickfix
+<leader>q
+
+# Document symbols
+<leader>ds
+
+# Workspace symbols
+<leader>ws
+
+% nvim, telescope
+
+# Find files
+<leader>ff  or  <leader>sf
+
+# Find buffer
+<leader>fb
+
+# Live grep in cwd
+<leader>fg  or  <leader>lg
+
+# Search current word
+<leader>sw
+
+# Find recent files
+<leader>s.
+
+# Search all open files (grep)
+<leader>s/
+
+# Fuzzy search current buffer
+<leader>/
+
+# Search keymaps
+<leader>sk
+
+# Search help tags
+<leader>sh
+
+# Search diagnostics
+<leader>sd
+
+# Resume last search
+<leader>sr
+
+# Find directory (Enter=cd, Ctrl-g=grep inside)
+<leader>fd
+
+# Search nvim config files
+<leader>sn
+
+# All existing buffers
+<leader><leader>
+
+# Inside Telescope: move down
+Ctrl-j
+
+# Inside Telescope: move up
+Ctrl-k
+
+% nvim, file explorer (neo-tree)
+
+# Float file explorer (toggle)
+<leader>e
+
+# Sidebar file explorer (toggle)
+<leader>t
+
+# Inside neo-tree: open file or expand
+o  or  Enter  or  l
+
+# Inside neo-tree: collapse node
+h
+
+# Inside neo-tree: add file (/ = directory)
+a
+
+# Inside neo-tree: delete
+d
+
+# Inside neo-tree: rename
+r
+
+# Inside neo-tree: vertical split
+s
+
+# Inside neo-tree: horizontal split
+S
+
+# Inside neo-tree: new tab
+t
+
+# Inside neo-tree: toggle hidden/dotfiles
+H
+
+# Inside neo-tree: float preview
+P
+
+# Inside neo-tree: refresh
+R
+
+# Inside neo-tree: close
+q
+
+% nvim, copilot
+
+# Accept whole suggestion (insert mode)
+Ctrl-f
+
+# Accept one word (insert mode)
+Alt-w
+
+# Accept one line (insert mode)
+Alt-j
+
+# Next suggestion (insert mode)
+Alt-]
+
+# Previous suggestion (insert mode)
+Alt-[
+
+# Dismiss suggestion (insert mode)
+Ctrl-]
+
+# Open copilot panel
+Alt-Enter  or  <leader>cp
+
+# Toggle copilot
+<leader>ct
+
+# Copilot status
+<leader>cs
+
+% nvim, comments
+
+# Toggle line comment
+gcc  (normal)   gc  (visual)
+
+# Toggle block comment
+gbc  (normal)   gb  (visual)

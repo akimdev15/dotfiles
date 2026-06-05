@@ -54,6 +54,11 @@ run = 'layout floating'
 if.app-name-regex-substring = 'quicktime'
 run = 'layout floating'
 
+[[on-window-detected]]
+if.app-name-regex-substring = 'ghostty'
+if.window-title-regex-substring = 'Cheatsheet'
+run = 'layout floating'
+
 [key-mapping]
 preset = 'qwerty'
 
@@ -122,6 +127,8 @@ alt-ctrl-down  = ['move-node-to-monitor --wrap-around down',  'focus-monitor --w
 
 alt-shift-semicolon = 'mode service'
 alt-shift-enter = 'mode apps'
+
+alt-shift-space = 'exec-and-forget bash -c "open -na Ghostty --args --title=Cheatsheet -e $HOME/dotfiles/scripts/cheatsheet"'
 
 alt-o = 'exec-and-forget open -a Obsidian'
 alt-f = 'exec-and-forget open -a Finder'

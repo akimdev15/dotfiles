@@ -9,7 +9,6 @@ echo "==> Installing dependencies..."
 if ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Add brew to PATH for Apple Silicon
   eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/usr/local/bin/brew shellenv)" 2>/dev/null
 fi
 
@@ -18,8 +17,8 @@ brew install felixkratz/formulae/sketchybar
 brew install FelixKratz/formulae/borders
 brew install neovim
 brew install tmux
+brew install navi
 
-# sketchybar app font for icons
 if ! brew list --cask font-sketchybar-app-font &>/dev/null; then
   brew install --cask font-sketchybar-app-font
 fi
@@ -45,14 +44,17 @@ backup_and_link() {
   echo "  linked: $dst -> $src"
 }
 
-backup_and_link "$DOTFILES/aerospace.toml"     "$HOME/.aerospace.toml"
-backup_and_link "$DOTFILES/sketchybar"          "$HOME/.config/sketchybar"
-backup_and_link "$DOTFILES/bordersrc"           "$HOME/.config/borders/bordersrc"
-backup_and_link "$DOTFILES/nvim"                "$HOME/.config/nvim"
-backup_and_link "$DOTFILES/tmux.conf"           "$HOME/.tmux.conf"
+backup_and_link "$DOTFILES/aerospace/aerospace.toml" "$HOME/.aerospace.toml"
+backup_and_link "$DOTFILES/sketchybar"               "$HOME/.config/sketchybar"
+backup_and_link "$DOTFILES/borders/bordersrc"        "$HOME/.config/borders/bordersrc"
+backup_and_link "$DOTFILES/nvim"                     "$HOME/.config/nvim"
+backup_and_link "$DOTFILES/tmux/tmux.conf"           "$HOME/.tmux.conf"
+backup_and_link "$DOTFILES/navi"                     "$HOME/.config/navi"
+
+echo "==> Making scripts executable..."
+chmod +x "$DOTFILES/scripts/cheatsheet"
 
 echo "==> Starting services..."
-
 brew services restart sketchybar
 brew services restart borders
 open -a AeroSpace 2>/dev/null || true
@@ -61,7 +63,10 @@ echo ""
 echo "Done! Next steps:"
 echo "  1. System Settings → Desktop & Dock → Menu Bar"
 echo "     → 'Automatically hide and show the menu bar' → Always"
-echo "  2. Grant Accessibility permissions if prompted:"
-echo "     System Settings → Privacy & Security → Accessibility → AeroSpace"
+echo "  2. Grant Accessibility: System Settings → Privacy & Security → Accessibility → AeroSpace"
+echo "  3. Reload AeroSpace: Alt-Shift-; then Esc"
+echo "  4. Install Neovim plugins: open nvim, run :Lazy sync"
+echo "  5. Install Neovim LSP servers: :MasonInstall lua-language-server jdtls pyright"
+echo "  6. Authorize GitHub Copilot: :Copilot auth"
 echo ""
-echo "Reload AeroSpace config: alt-shift-; then esc"
+echo "Cheatsheet popup: Alt-Shift-Space (anywhere) or prefix+? (inside tmux)"
