@@ -123,12 +123,12 @@ alt-ctrl-down  = ['move-node-to-monitor --wrap-around down',  'focus-monitor --w
 alt-shift-semicolon = 'mode service'
 alt-shift-enter = 'mode apps'
 
-alt-o = 'exec-and-forget open -a /Applications/Obsidian.app'
-alt-f = 'exec-and-forget open -a /System/Library/CoreServices/Finder.app'
-alt-g = 'exec-and-forget open -a /Applications/Ghostty.app'
-alt-i = 'exec-and-forget open -a "/Applications/IntelliJ IDEA.app"'
-alt-b = 'exec-and-forget open -a "/Applications/Brave Browser.app"'
-alt-v = 'exec-and-forget open -a "/Applications/Visual Studio Code.app"'
+alt-o = 'exec-and-forget open -a Obsidian'
+alt-f = 'exec-and-forget open -a Finder'
+alt-g = 'exec-and-forget open -a Ghostty'
+alt-i = 'exec-and-forget open -a "IntelliJ IDEA"'
+alt-b = 'exec-and-forget open -a "Brave Browser"'
+alt-v = 'exec-and-forget open -a "Visual Studio Code"'
 
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
@@ -137,4 +137,4 @@ f = ['layout floating tiling', 'mode main']
 backspace = ['close-all-windows-but-current', 'mode main']
 
 [mode.apps.binding]
-alt-g = ['exec-and-forget open -a /Applications/Ghostty.app', 'mode main']
+alt-g = ['exec-and-forget open -a Ghostty', 'mode main']
