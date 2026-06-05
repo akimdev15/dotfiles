@@ -70,6 +70,21 @@ open -a AeroSpace
 1. Grant Accessibility permissions: System Settings → Privacy & Security → Accessibility → **AeroSpace**
 2. Reload AeroSpace config: `alt-shift-;` then `esc`
 
+#### If apps don't appear in the permission list
+
+macOS may not list AeroSpace, sketchybar, or borders automatically. Add them manually:
+
+- System Settings → Privacy & Security → Accessibility → click **+**
+- Navigate to the Homebrew Cellar and select the binary:
+
+| App | Path |
+|---|---|
+| AeroSpace | `/opt/homebrew/Caskroom/nikitabobko-aerospace/<version>/AeroSpace.app` |
+| sketchybar | `/opt/homebrew/bin/sketchybar` |
+| borders | `/opt/homebrew/bin/borders` |
+
+> **Tip:** In the Finder open dialog press `Cmd-Shift-G` and paste the path to jump directly to it.
+
 ### Verify
 
 - AeroSpace: `alt-1` through `alt-9` switches workspaces
