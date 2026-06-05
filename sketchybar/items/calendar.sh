@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-sketchybar --add item clock_date center \
+sketchybar --add item clock_date right \
            --set clock_date \
                update_freq=30 \
                icon.drawing=off \
@@ -12,7 +12,7 @@ sketchybar --add item clock_date center \
                script="$PLUGIN_DIR/calendar.sh" \
            --subscribe clock_date system_woke \
            \
-           --add item clock_time center \
+           --add item clock_time right \
            --set clock_time \
                update_freq=30 \
                icon.drawing=off \
