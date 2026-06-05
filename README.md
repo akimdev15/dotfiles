@@ -69,6 +69,7 @@ open -a AeroSpace
 
 1. Grant Accessibility permissions: System Settings → Privacy & Security → Accessibility → **AeroSpace**
 2. Reload AeroSpace config: `alt-shift-;` then `esc`
+3. Hide native menu bar so sketchybar takes over: System Settings → Desktop & Dock → Menu Bar → "Automatically hide and show the menu bar" → **Always** (the install script sets this automatically via `defaults write`)
 
 #### If apps don't appear in the permission list
 

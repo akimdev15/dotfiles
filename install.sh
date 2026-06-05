@@ -52,6 +52,9 @@ backup_and_link "$DOTFILES/bordersrc"           "$HOME/.config/borders/bordersrc
 backup_and_link "$DOTFILES/nvim"                "$HOME/.config/nvim"
 backup_and_link "$DOTFILES/tmux.conf"           "$HOME/.tmux.conf"
 
+echo "==> Hiding native macOS menu bar (sketchybar replaces it)..."
+defaults write NSGlobalDomain _HIHideMenuBar -bool true
+
 echo "==> Starting services..."
 
 brew services start sketchybar
