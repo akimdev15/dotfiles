@@ -58,12 +58,12 @@ run = 'layout floating'
 preset = 'qwerty'
 
 [gaps]
-inner.vertical =   8
-inner.horizontal = 10
-outer.left =       16
-outer.right =      16
-outer.bottom =     16
-outer.top =        [{ monitor."Built-in Retina Display" = 16 }, 52]
+inner.vertical =   4
+inner.horizontal = 6
+outer.left =       8
+outer.right =      8
+outer.bottom =     8
+outer.top =        [{ monitor."Built-in Retina Display" = 8 }, 46]
 
 [mode.main.binding]
 
