@@ -39,6 +39,7 @@ require('lazy').setup({
   { import = 'plugins.tools' },    -- neo-tree, tmux-navigator
   { import = 'plugins.leetcode' }, -- LeetCode + Obsidian vault integration
   { import = 'plugins.copilot' }, -- GitHub Copilot ghost-text (comment out to remove)
+  { import = 'plugins.lazygit' }, -- Lazygit floating window
 }, {
   ui = {
     icons = vim.g.have_nerd_font and {} or {
