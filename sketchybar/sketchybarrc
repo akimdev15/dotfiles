@@ -15,10 +15,11 @@ sketchybar --bar     height=36                                         \
                      color=$BAR_COLOR                                  \
                      shadow=$SHADOW                                    \
                      position=top                                      \
+                     topmost=window                                    \
                      sticky=on                                         \
                      padding_right=12                                  \
                      padding_left=12                                   \
-                     blur_radius=30                                    \
+                     blur_radius=0                                     \
                      notch_width=0                                     \
                                                                        \
            --default updates=when_shown                                \

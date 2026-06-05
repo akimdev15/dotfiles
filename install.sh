@@ -20,9 +20,8 @@ brew install neovim
 brew install tmux
 
 # sketchybar app font for icons
-if ! fc-list 2>/dev/null | grep -qi "sketchybar"; then
-  brew tap FelixKratz/formulae
-  brew install sketchybar-app-font
+if ! brew list --cask font-sketchybar-app-font &>/dev/null; then
+  brew install --cask font-sketchybar-app-font
 fi
 
 echo "==> Creating symlinks..."
@@ -52,18 +51,17 @@ backup_and_link "$DOTFILES/bordersrc"           "$HOME/.config/borders/bordersrc
 backup_and_link "$DOTFILES/nvim"                "$HOME/.config/nvim"
 backup_and_link "$DOTFILES/tmux.conf"           "$HOME/.tmux.conf"
 
-echo "==> Hiding native macOS menu bar (sketchybar replaces it)..."
-defaults write com.apple.dock autohide-menubar -bool true
-killall Dock
-
 echo "==> Starting services..."
 
-brew services start sketchybar
-brew services start borders
+brew services restart sketchybar
+brew services restart borders
 open -a AeroSpace 2>/dev/null || true
 
 echo ""
-echo "Done. Grant Accessibility permissions if prompted:"
-echo "  System Settings → Privacy & Security → Accessibility → AeroSpace"
+echo "Done! Next steps:"
+echo "  1. System Settings → Desktop & Dock → Menu Bar"
+echo "     → 'Automatically hide and show the menu bar' → Always"
+echo "  2. Grant Accessibility permissions if prompted:"
+echo "     System Settings → Privacy & Security → Accessibility → AeroSpace"
 echo ""
 echo "Reload AeroSpace config: alt-shift-; then esc"

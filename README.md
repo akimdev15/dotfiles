@@ -37,8 +37,7 @@ brew install felixkratz/formulae/sketchybar
 brew install FelixKratz/formulae/borders
 
 # App font for sketchybar icons
-brew tap FelixKratz/formulae
-brew install sketchybar-app-font
+brew install --cask font-sketchybar-app-font
 ```
 
 #### 2. Clone this repo
@@ -58,8 +57,8 @@ mkdir -p ~/.config/borders && ln -sf ~/dotfiles/bordersrc ~/.config/borders/bord
 #### 4. Start services
 
 ```bash
-brew services start sketchybar
-brew services start borders
+brew services restart sketchybar
+brew services restart borders
 open -a AeroSpace
 ```
 
@@ -67,9 +66,10 @@ open -a AeroSpace
 
 ### After install
 
-1. Grant Accessibility permissions: System Settings → Privacy & Security → Accessibility → **AeroSpace**
-2. Reload AeroSpace config: `alt-shift-;` then `esc`
-3. Hide native menu bar so sketchybar takes over: System Settings → Desktop & Dock → Menu Bar → "Automatically hide and show the menu bar" → **Always** (the install script sets this automatically via `defaults write`)
+1. **Hide native menu bar** so sketchybar takes over:
+   System Settings → Desktop & Dock → Menu Bar → "Automatically hide and show the menu bar" → **Always**
+2. Grant Accessibility permissions: System Settings → Privacy & Security → Accessibility → **AeroSpace**
+3. Reload AeroSpace config: `alt-shift-;` then `esc`
 
 #### If apps don't appear in the permission list
 
