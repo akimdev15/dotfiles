@@ -59,6 +59,7 @@ backup_and_link "$DOTFILES/borders/bordersrc"        "$HOME/.config/borders/bord
 backup_and_link "$DOTFILES/nvim"                     "$HOME/.config/nvim"
 backup_and_link "$DOTFILES/tmux/tmux.conf"           "$HOME/.tmux.conf"
 backup_and_link "$DOTFILES/navi"                     "$HOME/.config/navi"
+backup_and_link "$DOTFILES/ghostty/config"           "$HOME/.config/ghostty/config"
 
 # zsh setup is intentionally NOT done here — see zsh/SETUP.md for a prompt
 # you can paste into Claude Code (or follow manually) on a new machine.
