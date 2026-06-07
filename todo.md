@@ -17,12 +17,6 @@ Optimizations deferred because they would change keybindings, look, or output. E
 - Why deferred: insert-mode keymaps need re-binding. Current `<C-j>`/`<C-k>`/`<C-y>` map cleanly but snippet jump (`<C-l>`/`<C-h>`) plumbing differs.
 - Path: add `Saghen/blink.cmp`, port the keymap table, swap `cmp_nvim_lsp` capabilities → `blink.cmp.get_lsp_capabilities()`.
 
-## Statusline — `vim-airline` → `lualine.nvim`
-
-- Pure Lua, no vimscript boot cost, ~50-100ms startup win.
-- Why deferred: visual layout differs slightly; airline themes don't map 1:1.
-- Path: add `nvim-lualine/lualine.nvim` with Dracula theme, remove airline.
-
 ## Fuzzy finder — `telescope.nvim` → `fzf-lua`
 
 - Uses native `fzf` binary directly, no Lua filtering hot loop. Faster previews on big repos.
@@ -42,8 +36,80 @@ Optimizations deferred because they would change keybindings, look, or output. E
 
 ## Mini family — `echasnovski/mini.*`
 
-- `mini.comment`, `mini.surround`, `mini.pairs`, `mini.indentscope` — all tiny, no startup hit.
-- Why deferred: would replace `Comment.nvim`; surround/pairs aren't installed yet but adding them is a behavior change.
+Tiny standalone modules from one author. Each loads independently, no shared core. Add only the ones you actually want.
+
+### `mini.surround` — manipulate surrounding pairs (`"`, `(`, `<tag>`, ...)
+
+| Key | Action |
+|---|---|
+| `sa{motion}{char}` | **s**urround **a**dd. e.g. `saiw"` → wrap inner word in `"`. |
+| `sd{char}` | **s**urround **d**elete. e.g. `sd(` → strip parens. |
+| `sr{from}{to}` | **s**urround **r**eplace. e.g. `sr'"` → `'foo'` → `"foo"`. |
+| `sf{char}` / `sF{char}` | find next / prev surrounding char. |
+| `sh{char}` | highlight matching surrounding. |
+
+### `mini.pairs` — auto-close brackets/quotes
+
+- Type `(` → `()` with cursor inside. Same for `[`, `{`, `"`, `'`, backticks.
+- `<BS>` inside empty pair removes both halves.
+- `<CR>` inside `{` opens a properly-indented block.
+- No new shortcuts — it just makes the keys you already press smarter.
+
+### `mini.comment` — comment toggling (Comment.nvim replacement)
+
+| Key | Action |
+|---|---|
+| `gcc` | toggle current line comment |
+| `gc{motion}` | toggle comment over motion (e.g. `gcap` = paragraph) |
+| `gc` (visual) | toggle comment over selection |
+
+Same keys as current `Comment.nvim`, so swap is invisible to muscle memory. Win: 1 plugin replaced with ~50 LoC from a module you'll already have for surround/pairs.
+
+### `mini.indentscope` — animated indent-scope guide
+
+- Vertical line marks the indent block your cursor is inside (function body, if-block, etc).
+- Motions:
+
+| Key | Action |
+|---|---|
+| `[i` / `]i` | jump to top / bottom of current scope |
+| `ii` / `ai` | text-object: **i**nner / **a**round indent scope (use with `d`, `c`, `y`, `v`) |
+
+### `mini.ai` — better text objects
+
+Extends `i` / `a` text-objects to many more targets.
+
+| Key | Action |
+|---|---|
+| `daf` | delete a function call (`foo(bar)`) |
+| `cif` | change inside function args |
+| `dia` | delete inner argument in a call list |
+| `vat` | select around HTML/XML tag |
+
+### `mini.move` — move lines/selections with `Alt-h/j/k/l`
+
+Like the `:m` command but on a key. Works in normal and visual mode.
+
+### Why deferred
+
+- Would replace `Comment.nvim` (same keys — no behavior change there).
+- `surround`/`pairs`/`ai`/`move` add *new* keymaps. User has to learn them. That's a behavior change.
+- Each module is ~5ms of startup at most. Combined zero-impact.
+
+### Path
+
+```lua
+-- nvim/lua/plugins/mini.lua
+return {
+  { 'echasnovski/mini.surround',    event = 'VeryLazy', opts = {} },
+  { 'echasnovski/mini.pairs',       event = 'InsertEnter', opts = {} },
+  { 'echasnovski/mini.ai',          event = 'VeryLazy', opts = {} },
+  { 'echasnovski/mini.move',        event = 'VeryLazy', opts = {} },
+  { 'echasnovski/mini.indentscope', event = { 'BufReadPre', 'BufNewFile' }, opts = {} },
+  -- and drop Comment.nvim once mini.comment is in:
+  -- { 'echasnovski/mini.comment',   event = 'VeryLazy', opts = {} },
+}
+```
 
 ## Treesitter — pin parsers ahead of `:TSUpdate`
 

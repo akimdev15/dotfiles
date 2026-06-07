@@ -244,3 +244,45 @@ gcc  (normal)   gc  (visual)
 
 # Toggle block comment
 gbc  (normal)   gb  (visual)
+
+% nvim, format (conform.nvim)
+
+# Format current buffer manually
+:lua require('conform').format()
+
+# Disable autoformat globally (until restart or :FormatEnable)
+:FormatDisable
+
+# Disable autoformat for current buffer only
+:FormatDisable!
+
+# Re-enable autoformat
+:FormatEnable
+
+% nvim, statusline (lualine)
+
+# Statusline layout (left → right)
+mode | branch +diff | filename ●modified | diagnostics ✱copilot ⚙lsp | encoding % | line:col
+
+# Macro-recording indicator (red) appears while q{reg} is active
+recording @<reg>
+
+# Search-count indicator (yellow) appears after / search
+3/27
+
+% nvim, config flags (lua/core/config.lua)
+
+# Master Rust toggle — flip to false to revert every gated swap
+prefer_rust = true
+
+# Use prettierd daemon instead of prettier (identical output, ~10x faster)
+use_prettierd = true
+
+# Format TOML on save via taplo
+use_taplo = true
+
+# Opt-in: biome replaces prettier for JS/TS/JSON
+use_biome = false
+
+# Opt-in: dprint replaces prettier for JSON/MD/YAML
+use_dprint = false
