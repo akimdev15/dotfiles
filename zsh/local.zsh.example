@@ -1,0 +1,33 @@
+# ============================================================================
+# Template for ~/.zshrc.local — per-machine zsh config.
+#
+# Copy this file once per machine:
+#     cp ~/dotfiles/zsh/local.zsh.example ~/.zshrc.local
+# Then uncomment / edit only the bits relevant to that machine.
+#
+# This file lives OUTSIDE the dotfiles repo so personal paths, secrets, and
+# work-specific configuration never get committed.
+# ============================================================================
+
+# ── Extra PATH entries (machine-specific tools) ──────────────────────────────
+# [ -d "/usr/local/cargo/bin" ] && export PATH="/usr/local/cargo/bin:$PATH"
+
+# ── Claude CLI variants (separate config dirs) ───────────────────────────────
+# alias claudea="CLAUDE_CONFIG_DIR=~/.claudea claude --dangerously-skip-permissions"
+# alias claudej="CLAUDE_CONFIG_DIR=~/.claudej claude --dangerously-skip-permissions"
+
+# ── Work-specific aliases ────────────────────────────────────────────────────
+# alias work-vpn='/Applications/SomeVPN.app/Contents/MacOS/cli connect'
+# alias deploy-prod='./scripts/deploy.sh production'
+
+# ── Secrets / API keys (NEVER commit these) ──────────────────────────────────
+# export GITHUB_TOKEN="..."
+# export OPENAI_API_KEY="..."
+# export ANTHROPIC_API_KEY="..."
+
+# ── Override theme on a per-machine basis ────────────────────────────────────
+# Set BEFORE the dotfiles zshrc would normally apply — put this in
+# ~/.zshenv.local instead so it takes effect before oh-my-zsh loads.
+
+# ── One-off function only used on this host ──────────────────────────────────
+# ssh-work() { ssh -p 2222 me@work.internal "$@"; }

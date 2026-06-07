@@ -1,0 +1,29 @@
+# ============================================================================
+# zshrc — interactive shell config. Runs AFTER .zshenv.
+# Sources themed modules from $DOTFILES/zsh/.
+# Per-machine overrides go in ~/.zshrc.local (gitignored, NOT in dotfiles).
+# ============================================================================
+
+# Allow override; default to the canonical dotfiles location.
+DOTFILES_ZSH="${DOTFILES_ZSH:-$HOME/dotfiles/zsh}"
+
+# ── oh-my-zsh ────────────────────────────────────────────────────────────────
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="half-life"
+plugins=(git)
+source "$ZSH/oh-my-zsh.sh"
+
+# ── Homebrew zsh completion functions ────────────────────────────────────────
+fpath[1,0]="/opt/homebrew/share/zsh/site-functions"
+
+# ── Modules (order matters: lazy stubs before aliases that depend on them) ───
+for module in lazy aliases functions; do
+  [ -f "$DOTFILES_ZSH/$module.zsh" ] && source "$DOTFILES_ZSH/$module.zsh"
+done
+
+# ── fzf ──────────────────────────────────────────────────────────────────────
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# ── Per-machine config (NOT in dotfiles) ─────────────────────────────────────
+# Copy zsh/local.zsh.example → ~/.zshrc.local and customize per machine.
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
