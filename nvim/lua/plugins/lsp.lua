@@ -27,25 +27,35 @@ return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     dependencies = { 'williamboman/mason.nvim' },
     event = 'VeryLazy',
-    opts = {
-      run_on_start = true,
-      ensure_installed = {
+    opts = (function()
+      local cfg = require('core.config')
+      local function on(flag) return cfg.prefer_rust and cfg[flag] end
+
+      local tools = {
         -- LSP servers
         'jdtls',           -- Java
         'pyright',         -- Python
         'typescript-language-server',
         'lua-language-server',
 
-        -- Formatters
-        'stylua',          -- Lua
-        'ruff',            -- Python (ruff_format)
-        'prettier',        -- JS/TS/JSON/CSS/MD/YAML
+        -- Formatters (always)
+        'stylua',          -- Lua  (Rust)
+        'ruff',             -- Python (Rust)
         'google-java-format',
         'goimports',       -- Go
         'golines',         -- Go line wrap
         -- Note: pg_format installed via Homebrew (see dotfiles/init_setup.sh)
-      },
-    },
+      }
+
+      -- prettier vs prettierd (identical output, daemon = fast)
+      table.insert(tools, on('use_prettierd') and 'prettierd' or 'prettier')
+
+      if on('use_taplo')  then table.insert(tools, 'taplo')  end
+      if on('use_biome')  then table.insert(tools, 'biome')  end
+      if on('use_dprint') then table.insert(tools, 'dprint') end
+
+      return { run_on_start = true, ensure_installed = tools }
+    end)(),
   },
 
   -- --------------------------------------------------------------------------

@@ -62,6 +62,10 @@ return {
     opts = {
       close_if_last_window = true,
       popup_border_style   = 'rounded',
+      -- Skip loading buffers/git_status source modules — we only open the filesystem tree.
+      sources              = { 'filesystem' },
+      -- Don't re-scan tree after every :w in a child file.
+      enable_refresh_on_write = false,
       -- gitsigns.nvim already shows git status in the editor gutter.
       -- Keeping this enabled causes neo-tree to run git subprocesses and do
       -- worktree/status lookups on every folder expand — measurably slow.

@@ -20,6 +20,14 @@ brew install tmux
 brew install navi
 brew install pgformatter   # `pg_format` — SQL formatter for Postgres
 
+# Rust-backed search / format tools — used by telescope and conform.nvim.
+# Mason can install some of these too, but Homebrew puts them on $PATH for
+# every shell, not only inside nvim.
+brew install ripgrep        # `rg` — telescope live_grep backend
+brew install fd             # `fd`  — fast find replacement
+brew install stylua         # Lua formatter (Rust)
+brew install taplo          # TOML formatter (Rust) — used when use_taplo=true
+
 if ! brew list --cask font-sketchybar-app-font &>/dev/null; then
   brew install --cask font-sketchybar-app-font
 fi

@@ -51,12 +51,16 @@ require('lazy').setup({
       lazy    = '💤 ',
     },
   },
+  change_detection = { enabled = false, notify = false }, -- skip filewatcher on plugin specs
   performance = {
+    cache = { enabled = true },
+    reset_packpath = true,
     rtp = {
       -- Disable built-in plugins that are never used — reduces RTP scan on every file open
       disabled_plugins = {
         'gzip', 'matchit', 'matchparen', 'netrwPlugin',
         'tarPlugin', 'tohtml', 'tutor', 'zipPlugin',
+        'rplugin', 'spellfile', 'man',
       },
     },
   },

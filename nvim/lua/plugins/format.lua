@@ -6,7 +6,30 @@
 --
 -- Manual format any time:  :lua require('conform').format()
 -- Skip auto-format once:   :w   →  :ConformDisable  /  :ConformEnable
+--
+-- Tool selection is driven by lua/core/config.lua flags. See that file to
+-- toggle Rust / daemon formatters on or off — output stays identical for
+-- defaulted-on flags (prettierd, taplo).
 -- ============================================================================
+
+local cfg = require('core.config')
+
+-- prefer_rust = false zeroes every use_* flag in one place.
+local function on(flag)
+  return cfg.prefer_rust and cfg[flag]
+end
+
+-- Identical-output: prettier daemon. Drop-in.
+local prettier   = on('use_prettierd') and 'prettierd' or 'prettier'
+-- Output-differing: biome replaces prettier across the JS/JSON family.
+local js_fmt     = on('use_biome')  and { 'biome' } or { prettier }
+local json_fmt   = on('use_biome')  and { 'biome' }
+                or on('use_dprint') and { 'dprint' }
+                or { prettier }
+local md_fmt     = on('use_dprint') and { 'dprint' } or { prettier }
+local yaml_fmt   = on('use_dprint') and { 'dprint' } or { prettier }
+local toml_fmt   = on('use_taplo')  and { 'taplo' }  or nil
+local web_fmt    = { prettier } -- css/html stay prettier; biome doesn't cover them
 
 return {
   {
@@ -26,23 +49,23 @@ return {
       end,
 
       formatters_by_ft = {
-        lua              = { 'stylua' },
-        python           = { 'ruff_format' },
+        lua              = { 'stylua' },           -- Rust
+        python           = { 'ruff_format' },      -- Rust
         java             = { 'google-java-format' },
         sql              = { 'pg_format' },
         go               = { 'goimports', 'golines' },
+        toml             = toml_fmt,               -- Rust (taplo) when enabled
 
-        -- Prettier covers the JS/TS family and common web formats.
-        javascript       = { 'prettier' },
-        javascriptreact  = { 'prettier' },
-        typescript       = { 'prettier' },
-        typescriptreact  = { 'prettier' },
-        json             = { 'prettier' },
-        jsonc            = { 'prettier' },
-        yaml             = { 'prettier' },
-        markdown         = { 'prettier' },
-        css              = { 'prettier' },
-        html             = { 'prettier' },
+        javascript       = js_fmt,
+        javascriptreact  = js_fmt,
+        typescript       = js_fmt,
+        typescriptreact  = js_fmt,
+        json             = json_fmt,
+        jsonc            = json_fmt,
+        yaml             = yaml_fmt,
+        markdown         = md_fmt,
+        css              = web_fmt,
+        html             = web_fmt,
       },
 
       formatters = {

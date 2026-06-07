@@ -87,8 +87,16 @@ return {
         end
       end
 
+      -- Skip the per-launch executable probe by passing rg args explicitly.
+      local vimgrep_arguments = vim.fn.executable('rg') == 1 and {
+        'rg', '--color=never', '--no-heading', '--with-filename',
+        '--line-number', '--column', '--smart-case',
+        '--hidden', '--glob=!.git/',
+      } or nil
+
       require('telescope').setup({
         defaults = {
+          vimgrep_arguments = vimgrep_arguments,
           mappings = {
             i = {
               ['<C-j>'] = actions.move_selection_next,
@@ -239,7 +247,17 @@ return {
 
   -- --------------------------------------------------------------------------
   -- Comment.nvim — gc / gb to toggle line / block comments
+  -- Lazy-loaded on the trigger keys so it stays off cold-start path.
   -- --------------------------------------------------------------------------
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    'numToStr/Comment.nvim',
+    keys = {
+      { 'gc',  mode = { 'n', 'x' } },
+      { 'gb',  mode = { 'n', 'x' } },
+      { 'gcc', mode = 'n' },
+      { 'gbc', mode = 'n' },
+    },
+    opts = {},
+  },
 
 }
