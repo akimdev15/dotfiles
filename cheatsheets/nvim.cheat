@@ -38,8 +38,11 @@ gD
 # Rename symbol
 <leader>rn
 
-# Code action
+# Code action (import fix, refactor)
 <leader>ca
+
+# Organize imports (Java / jdtls only)
+<leader>oi
 
 # Signature help
 Ctrl-s
@@ -114,10 +117,10 @@ Ctrl-k
 
 % nvim, file explorer (neo-tree)
 
-# Float file explorer (toggle)
+# Float file explorer (reveals current file if open, else toggle)
 <leader>e
 
-# Sidebar file explorer (toggle)
+# Sidebar file explorer (reveals current file if open, else toggle)
 <leader>t
 
 # Inside neo-tree: open file or expand
@@ -184,6 +187,55 @@ Alt-Enter  or  <leader>cp
 
 # Copilot status
 <leader>cs
+
+# Copilot auth (login)
+<leader>cA
+
+# Copilot enable
+<leader>ce
+
+# Copilot disable
+<leader>cd
+
+% nvim, accept (copilot suggestions, insert mode)
+
+# Accept whole copilot suggestion
+Ctrl-f
+
+# Accept one word from copilot
+Alt-w
+
+# Accept one line from copilot
+Alt-j
+
+# Cycle to next copilot suggestion
+Alt-]
+
+# Cycle to previous copilot suggestion
+Alt-[
+
+# Dismiss copilot suggestion
+Ctrl-]
+
+% nvim, completion menu (nvim-cmp, insert mode)
+
+# Open completion menu manually
+Ctrl-Space
+
+# Select next completion item
+Ctrl-j
+
+# Select previous completion item
+Ctrl-k
+
+# Accept selected completion item
+Ctrl-y
+
+# Snippet: jump to next placeholder
+Ctrl-l
+
+# Snippet: jump to previous placeholder
+Ctrl-h
 
 % nvim, comments
 

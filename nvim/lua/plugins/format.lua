@@ -46,6 +46,9 @@ return {
       },
 
       formatters = {
+        ['google-java-format'] = {
+          prepend_args = { '--aosp' },
+        },
         pg_format = {
           command = 'pg_format',
           args    = { '-' },     -- read stdin, write stdout

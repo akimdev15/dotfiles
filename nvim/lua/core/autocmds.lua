@@ -65,6 +65,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- ============================================================================
+-- Java: 4-space indent
+-- ============================================================================
+vim.api.nvim_create_autocmd('FileType', {
+  pattern  = 'java',
+  group    = vim.api.nvim_create_augroup('java-indent', { clear = true }),
+  callback = function()
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.tabstop    = 4
+  end,
+})
+
+-- ============================================================================
 -- Java: Run main() with <F5>
 -- Finds the Maven root via pom.xml and runs: ./mvnw compile exec:java
 -- ============================================================================

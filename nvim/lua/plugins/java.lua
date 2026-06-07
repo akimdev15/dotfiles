@@ -35,6 +35,9 @@ return {
         }
 
         jdtls.start_or_attach(config)
+
+        vim.keymap.set('n', '<leader>oi', jdtls.organize_imports,
+          { buffer = true, desc = '[O]rganize [I]mports' })
       end
 
       vim.api.nvim_create_autocmd('FileType', {
@@ -52,6 +55,36 @@ return {
           vim.bo.cindent     = true
           vim.bo.smartindent = false
         end,
+      })
+
+      -- Scaffold new .java files: package declaration + class skeleton.
+      -- Fires on BufNewFile (`:e new.java`) AND BufReadPost when the file
+      -- exists but is empty (e.g. neo-tree `a` creates the file on disk first).
+      local function scaffold_java()
+        if vim.api.nvim_buf_line_count(0) > 1
+          or (vim.fn.getline(1) or '') ~= '' then
+          return
+        end
+
+        local dir = vim.fn.expand('%:p:h')
+        local pkg = dir:match('src/main/java/(.*)') or dir:match('src/test/java/(.*)')
+        if not pkg then return end
+
+        local class = vim.fn.expand('%:t:r')
+        local lines = {
+          'package ' .. pkg:gsub('/', '.') .. ';',
+          '',
+          'public class ' .. class .. ' {',
+          '}',
+          '',
+        }
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+        vim.api.nvim_win_set_cursor(0, { 3, #lines[3] - 1 })
+      end
+
+      vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
+        pattern  = '*.java',
+        callback = scaffold_java,
       })
     end,
   },

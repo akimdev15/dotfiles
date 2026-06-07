@@ -6,8 +6,8 @@ return {
   -- --------------------------------------------------------------------------
   -- neo-tree — modern file explorer
   --
-  --   <leader>e   floating popup  (opens/closes independently of sidebar)
-  --   <leader>t   left sidebar    (stays pinned while you work)
+  --   <leader>e   floating popup  (reveals current file if open, else toggle)
+  --   <leader>t   left sidebar    (reveals current file if open, else toggle)
   --
   -- Inside neo-tree (both float and sidebar):
   --   o / <Enter> open file OR expand/collapse folder
@@ -34,27 +34,6 @@ return {
       -- neo-tree must disable netrw before anything else loads
       vim.g.loaded_netrw       = 1
       vim.g.loaded_netrwPlugin = 1
-
-      vim.api.nvim_create_autocmd('VimEnter', {
-        group = vim.api.nvim_create_augroup('open-neotree-on-directory', { clear = true }),
-        callback = function()
-          if vim.fn.argc() ~= 1 then return end
-
-          local path = vim.fn.argv(0)
-          if vim.fn.isdirectory(path) ~= 1 then return end
-
-          local dir = vim.fn.fnamemodify(path, ':p')
-          vim.schedule(function()
-            require('lazy').load({ plugins = { 'neo-tree.nvim' } })
-            require('neo-tree.command').execute({
-              action = 'show',
-              source = 'filesystem',
-              position = 'left',
-              dir = dir,
-            })
-          end)
-        end,
-      })
     end,
     cmd = 'Neotree',
     dependencies = {
@@ -63,19 +42,19 @@ return {
       'MunifTanjim/nui.nvim',
     },
     keys = {
-      -- Float: opens/closes its own window, independent of the sidebar
       {
         '<leader>e',
         function()
-          require('neo-tree.command').execute({ toggle = true, position = 'float' })
+          local has_file = vim.bo.buftype == '' and vim.api.nvim_buf_get_name(0) ~= ''
+          require('neo-tree.command').execute({ toggle = true, reveal = has_file, position = 'float' })
         end,
         desc = 'Float file explorer',
       },
-      -- Sidebar: toggle pinned left panel
       {
         '<leader>t',
         function()
-          require('neo-tree.command').execute({ toggle = true, position = 'left' })
+          local has_file = vim.bo.buftype == '' and vim.api.nvim_buf_get_name(0) ~= ''
+          require('neo-tree.command').execute({ toggle = true, reveal = has_file, position = 'left' })
         end,
         desc = 'Sidebar file explorer',
       },
@@ -139,6 +118,7 @@ return {
         },
         -- Off by default: when enabled, every BufEnter rescans the tree to reveal
         -- the open file (fs_scan + git status). That makes neo-tree opens feel very slow.
+        hijack_netrw_behavior  = 'disabled',    -- don't auto-open on nvim .
         follow_current_file    = { enabled = false, leave_dirs_open = true },
         use_libuv_file_watcher = false,   -- macOS: libuv watchers on expand = very slow
         -- 'always' overrides the hardcoded async=false in toggle_directory, making

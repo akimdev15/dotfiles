@@ -59,7 +59,7 @@ return {
       { '<leader>ct', '<cmd>Copilot toggle<CR>',         desc = '[C]opilot [T]oggle' },
       { '<leader>cs', '<cmd>Copilot status<CR>',         desc = '[C]opilot [S]tatus' },
       { '<leader>cp', '<cmd>Copilot panel<CR>',          desc = '[C]opilot [P]anel' },
-      { '<leader>ca', '<cmd>Copilot auth<CR>',           desc = '[C]opilot [A]uth' },
+      { '<leader>cA', '<cmd>Copilot auth<CR>',           desc = '[C]opilot [A]uth' },
       { '<leader>ce', '<cmd>Copilot enable<CR>',         desc = '[C]opilot [E]nable' },
       { '<leader>cd', '<cmd>Copilot disable<CR>',        desc = '[C]opilot [D]isable' },
     },
