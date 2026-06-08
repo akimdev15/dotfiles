@@ -147,19 +147,6 @@ return {
           lualine_y = {},
           lualine_z = {},
         },
-        tabline = {
-          lualine_a = {
-            {
-              'buffers',
-              mode             = 2, -- show buffer number + name
-              show_modified_status = true,
-              symbols          = { modified = ' ●', alternate_file = '#', directory = '' },
-            },
-          },
-          lualine_z = {
-            { 'tabs', mode = 1 },
-          },
-        },
         extensions = { 'neo-tree', 'lazy', 'mason', 'quickfix', 'fugitive' },
       })
     end,
