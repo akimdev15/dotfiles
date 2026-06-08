@@ -8,16 +8,18 @@ return {
     ft = 'java',
     config = function()
       local function find_lombok_jar()
-        local jars = vim.fn.glob(
-          vim.fn.expand('~/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar'),
-          false, true
-        )
+        local m2 = vim.fn.expand('~/.m2')
+        local jars = vim.fn.glob(m2 .. '/repository/org/projectlombok/lombok/*/lombok-*.jar', false, true)
         jars = vim.tbl_filter(function(j) return not j:find('sources') end, jars)
         table.sort(jars)
         return jars[#jars]
       end
 
       local lombok_jar = find_lombok_jar()
+
+      if not lombok_jar then
+        vim.notify('nvim-jdtls: lombok jar not found in ~/.m2 — Lombok annotations may not resolve', vim.log.levels.WARN)
+      end
 
       local function attach()
         local jdtls     = require('jdtls')
@@ -29,12 +31,13 @@ return {
         local project_name = vim.fn.fnamemodify(root, ':p:h:t')
         local workspace    = vim.fn.stdpath('data') .. '/jdtls-workspace/' .. project_name
 
+        local cmd = { mason_bin .. '/jdtls', '-data', workspace }
+        if lombok_jar then
+          table.insert(cmd, 2, '--jvm-arg=-javaagent:' .. lombok_jar)
+        end
+
         local config = {
-          cmd = {
-            mason_bin .. '/jdtls',
-            '--jvm-arg=-javaagent:' .. lombok_jar,
-            '-data', workspace,
-          },
+          cmd = cmd,
           root_dir = root,
           settings = {
             java = {
