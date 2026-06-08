@@ -32,6 +32,9 @@ Alt-H
 # Next window
 Alt-L
 
+# Last window (toggle back)
+prefix + l
+
 # New window
 prefix + c
 
