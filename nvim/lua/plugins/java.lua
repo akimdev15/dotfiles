@@ -7,6 +7,18 @@ return {
     'mfussenegger/nvim-jdtls',
     ft = 'java',
     config = function()
+      local function find_lombok_jar()
+        local jars = vim.fn.glob(
+          vim.fn.expand('~/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar'),
+          false, true
+        )
+        jars = vim.tbl_filter(function(j) return not j:find('sources') end, jars)
+        table.sort(jars)
+        return jars[#jars]
+      end
+
+      local lombok_jar = find_lombok_jar()
+
       local function attach()
         local jdtls     = require('jdtls')
         local mason_bin = vim.fn.stdpath('data') .. '/mason/bin'
@@ -16,8 +28,6 @@ return {
         ) or vim.fn.getcwd()
         local project_name = vim.fn.fnamemodify(root, ':p:h:t')
         local workspace    = vim.fn.stdpath('data') .. '/jdtls-workspace/' .. project_name
-
-        local lombok_jar = vim.fn.expand('~/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar')
 
         local config = {
           cmd = {
