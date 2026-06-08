@@ -17,8 +17,14 @@ return {
         local project_name = vim.fn.fnamemodify(root, ':p:h:t')
         local workspace    = vim.fn.stdpath('data') .. '/jdtls-workspace/' .. project_name
 
+        local lombok_jar = vim.fn.expand('~/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar')
+
         local config = {
-          cmd = { mason_bin .. '/jdtls', '-data', workspace },
+          cmd = {
+            mason_bin .. '/jdtls',
+            '--jvm-arg=-javaagent:' .. lombok_jar,
+            '-data', workspace,
+          },
           root_dir = root,
           settings = {
             java = {
