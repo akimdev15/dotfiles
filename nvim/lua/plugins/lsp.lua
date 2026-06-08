@@ -75,22 +75,9 @@ return {
       'hrsh7th/cmp-nvim-lsp',
       { 'j-hui/fidget.nvim', opts = {} },
     },
-    config = function()
-      local mason_bin = vim.fn.stdpath('data') .. '/mason/bin'
-      if not vim.env.PATH:find(mason_bin, 1, true) then
-        vim.env.PATH = mason_bin .. ':' .. vim.env.PATH
-      end
-
-      -- ── UI Enhancements ──────────────────────────────────────────────────
-      -- Add borders to floating windows (hover, signature help, etc.)
-      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = 'rounded',
-      })
-      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = 'rounded',
-      })
-
-      -- ── LSP keymaps (set when a server attaches to a buffer) ─────────────
+    -- init runs at startup regardless of ft lazy-loading, so keymaps fire for
+    -- ALL LSP clients (including nvim-jdtls for Java which never triggers ft above)
+    init = function()
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
         callback = function(event)
@@ -106,12 +93,12 @@ return {
           map('gd',         telescope('lsp_definitions'),               '[G]oto [D]efinition')
           map('gr',         telescope('lsp_references'),                '[G]oto [R]eferences')
           map('gI',         telescope('lsp_implementations'),           '[G]oto [I]mplementation')
-          map('gD',         vim.lsp.buf.declaration,         '[G]oto [D]eclaration')
+          map('gD',         vim.lsp.buf.declaration,                    '[G]oto [D]eclaration')
           map('<leader>D',  telescope('lsp_type_definitions'),          'Type [D]efinition')
           map('<leader>ds', telescope('lsp_document_symbols'),          '[D]ocument [S]ymbols')
           map('<leader>ws', telescope('lsp_dynamic_workspace_symbols'), '[W]orkspace [S]ymbols')
-          map('<leader>rn', vim.lsp.buf.rename,              '[R]e[n]ame')
-          map('<leader>ca', vim.lsp.buf.code_action,         '[C]ode [A]ction')
+          map('<leader>rn', vim.lsp.buf.rename,                         '[R]e[n]ame')
+          map('<leader>ca', vim.lsp.buf.code_action,                    '[C]ode [A]ction')
           map('<C-s>', function()
             vim.lsp.buf.signature_help({ border = 'rounded' })
           end, 'Signature Help')
@@ -119,7 +106,6 @@ return {
             vim.lsp.buf.hover({ border = 'rounded' })
           end, 'Hover Documentation')
 
-          -- Highlight word under cursor while it stays there
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client.server_capabilities.documentHighlightProvider then
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -132,6 +118,20 @@ return {
             })
           end
         end,
+      })
+    end,
+    config = function()
+      local mason_bin = vim.fn.stdpath('data') .. '/mason/bin'
+      if not vim.env.PATH:find(mason_bin, 1, true) then
+        vim.env.PATH = mason_bin .. ':' .. vim.env.PATH
+      end
+
+      -- ── UI Enhancements ──────────────────────────────────────────────────
+      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
+        border = 'rounded',
+      })
+      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+        border = 'rounded',
       })
 
       -- ── LSP capabilities (enhanced by nvim-cmp) ───────────────────────────
