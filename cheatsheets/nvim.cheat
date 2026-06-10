@@ -270,6 +270,20 @@ recording @<reg>
 # Search-count indicator (yellow) appears after / search
 3/27
 
+% nvim, testing (vim-test)
+
+# Run nearest test method
+<leader>nn
+
+# Run all tests in current file
+<leader>nf
+
+# Run full test suite
+<leader>ns
+
+# Re-run last test
+<leader>nl
+
 % nvim, config flags (lua/core/config.lua)
 
 # Master Rust toggle — flip to false to revert every gated swap
