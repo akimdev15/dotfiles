@@ -2,7 +2,7 @@ font-family = JetBrainsMono Nerd Font
 font-size = 15
 theme = Dracula
 
-background-opacity = 0.80
+background-opacity = 0.87
 background-blur-radius = 20
 
 window-padding-balance = true

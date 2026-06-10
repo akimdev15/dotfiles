@@ -37,7 +37,7 @@ return {
         end
 
         local config = {
-          cmd = cmd,
+          cmd      = cmd,
           root_dir = root,
           settings = {
             java = {

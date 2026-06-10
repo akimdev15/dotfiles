@@ -97,6 +97,12 @@ return {
       require('telescope').setup({
         defaults = {
           vimgrep_arguments = vimgrep_arguments,
+          path_display = function(_, path)
+            local tail = vim.fn.fnamemodify(path, ':t')
+            local parent = vim.fn.fnamemodify(path, ':h')
+            if parent == '.' or parent == '' then return tail end
+            return string.format('%s  %s', tail, parent)
+          end,
           mappings = {
             i = {
               ['<C-j>'] = actions.move_selection_next,

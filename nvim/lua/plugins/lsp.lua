@@ -38,6 +38,7 @@ return {
         'typescript-language-server',
         'lua-language-server',
 
+
         -- Formatters (always)
         'stylua',          -- Lua  (Rust)
         'ruff',             -- Python (Rust)
