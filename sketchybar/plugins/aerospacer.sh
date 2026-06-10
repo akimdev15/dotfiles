@@ -39,16 +39,26 @@ FOCUSED=$(aerospace list-workspaces --focused 2>/dev/null | tr -d '[:space:]')
 APP=$(aerospace list-windows --workspace "$1" 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}')
 ICON=$(get_app_icon "$APP")
 
+if [ "$ICON" = ":default:" ]; then
+    LABEL="$APP"
+    LABEL_FONT="SF Pro:Semibold:11.0"
+else
+    LABEL="$ICON"
+    LABEL_FONT="sketchybar-app-font:Regular:14.0"
+fi
+
 if [ "$1" = "$FOCUSED" ]; then
     sketchybar --set "$NAME" \
         background.drawing=on \
         icon.highlight=on \
-        label="$ICON" \
+        label="$LABEL" \
+        label.font="$LABEL_FONT" \
         label.drawing=on
 else
     sketchybar --set "$NAME" \
         background.drawing=off \
         icon.highlight=off \
-        label="$ICON" \
-        label.drawing=$([ -n "$ICON" ] && echo on || echo off)
+        label="$LABEL" \
+        label.font="$LABEL_FONT" \
+        label.drawing=$([ -n "$LABEL" ] && echo on || echo off)
 fi
