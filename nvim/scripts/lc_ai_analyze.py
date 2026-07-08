@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 LeetCode AI Note Analyzer
-Receives problem data via stdin as JSON, calls Gemini CLI (headless),
-then updates the Obsidian note with analysis + Excalidraw trace diagram.
+Receives problem data via stdin as JSON, calls Claude Sonnet (headless),
+then updates the Obsidian note with complexity analysis + Excalidraw trace.
 """
 
 import sys
@@ -260,83 +260,186 @@ def compress_to_excalidraw(scene_dict):
         return None
 
 
-# ─── Gemini call ──────────────────────────────────────────────────────────────
+# ─── Claude call infrastructure ───────────────────────────────────────────────
 
-def call_gemini(title, difficulty, lang, code, time_c, space_c):
-    prompt = f"""Analyze this LeetCode solution and return ONLY valid JSON with no markdown fences.
+SONNET_MODEL = "claude-sonnet-4-6"
+
+class QuotaExceeded(Exception):
+    pass
+
+def _is_quota_error(text):
+    if not text:
+        return False
+    t = text.lower()
+    return any(s in t for s in (
+        "rate limit", "quota", "usage limit", "exceeded", "5-hour", "5 hour",
+        "too many requests", "throttled",
+    ))
+
+def run_claude(prompt, timeout=180):
+    """Run claude CLI headless. Raises QuotaExceeded or RuntimeError."""
+    result = subprocess.run(
+        ["claude", "-p", prompt, "--model", SONNET_MODEL, "--output-format", "text"],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=timeout,
+        cwd="/tmp",  # avoid loading project CLAUDE.md from nvim's cwd
+        preexec_fn=__import__('os').setsid,
+    )
+    if result.returncode != 0:
+        err = (result.stderr or "").strip() or (result.stdout or "").strip()
+        if _is_quota_error(err):
+            raise QuotaExceeded(f"claude quota: {err[:200]}")
+        raise RuntimeError(f"claude exited {result.returncode}: {err[:300]}")
+    text = result.stdout.strip()
+    if _is_quota_error(text):
+        raise QuotaExceeded(f"claude quota in stdout: {text[:200]}")
+    return text
+
+def parse_json_response(text):
+    text = re.sub(r'^```[a-zA-Z0-9]*\n?', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\n?```$',              '', text, flags=re.MULTILINE)
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if not match:
+        raise ValueError(f"No JSON in response: {text[:300]}")
+    return json.loads(match.group())
+
+def strip_html(s):
+    """Coarse HTML → plain text for problem statement."""
+    if not s:
+        return ""
+    s = re.sub(r'<sup>(.*?)</sup>', r'^\1', s, flags=re.DOTALL)
+    s = re.sub(r'<sub>(.*?)</sub>', r'_\1', s, flags=re.DOTALL)
+    s = re.sub(r'<code>(.*?)</code>', r'`\1`', s, flags=re.DOTALL)
+    s = re.sub(r'<br\s*/?>', '\n', s, flags=re.IGNORECASE)
+    s = re.sub(r'</p>', '\n\n', s, flags=re.IGNORECASE)
+    s = re.sub(r'</li>', '\n', s, flags=re.IGNORECASE)
+    s = re.sub(r'<[^>]+>', '', s)
+    s = (s.replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>')
+           .replace('&amp;', '&').replace('&quot;', '"').replace('&#39;', "'"))
+    s = re.sub(r'\n{3,}', '\n\n', s)
+    return s.strip()
+
+# ─── Sonnet: full analysis of user's submission ───────────────────────────────
+
+COMPLEXITY_INSTRUCTIONS = """Complexity analysis rules — apply ALL:
+- Determine Big-O from the ACTUAL code structure, not the problem category
+- Count loop nesting carefully; amortized ops (HashMap, monotonic stack/deque, union-find path compression) are O(1) amortized per operation — do NOT treat them as O(n) per call
+- Recursion: space complexity MUST include the call stack depth (e.g. O(h) for tree DFS where h is tree height, O(n) for linear recursion)
+- Amortized total: if an element is pushed/popped from a structure at most once across all iterations, the total work is O(n) even inside nested loops
+- If you are uncertain about an amortized or non-obvious bound, write the complexity followed by "[verify]" — do NOT guess"""
+
+def call_sonnet_full(title, difficulty, lang, problem_statement, user_code, heuristic_time, heuristic_space):
+    prompt = f"""Analyze this LeetCode submission. Return ONLY JSON, no markdown fences.
 
 Problem: {title} ({difficulty})
-Language: {lang}
-Time Complexity: {time_c}  |  Space Complexity: {space_c}
 
+Problem statement:
+{problem_statement or '(not provided)'}
+
+Submitter's code:
 ```{lang}
-{code}
+{user_code}
 ```
 
-Return exactly this JSON shape:
+Heuristic guess (often wrong — verify from code): Time≈{heuristic_time}, Space≈{heuristic_space}.
+
+{COMPLEXITY_INSTRUCTIONS}
+
+JSON shape:
 {{
-  "complexity_why": "2-3 sentences WHY the time complexity is {time_c}. Reference specific loops/ops in the code.",
-  "tradeoffs": "2-3 sentences on trade-offs of this approach vs alternatives.",
-  "improvements": "2-3 sentences on concrete optimizations or alternative approaches.",
+  "my_time": "Big-O time. Exact. Include log/amortized factors.",
+  "my_time_why": "1-2 sentences. Reference specific loops, recursion, or amortized ops in the code.",
+  "my_space": "Big-O space. Include recursion call stack if applicable.",
+  "my_space_why": "1-2 sentences. Reference what data structures or call stack frames are allocated.",
+  "tradeoffs": "1-2 sentences: trade-offs of this approach vs common alternatives (time/space, simplicity, edge cases).",
+  "improvements": "1-2 sentences: concrete suggestions to improve time, space, or code quality.",
+  "is_complex": true_or_false,
+  "walkthrough_md": "ONLY when is_complex=false. Concise markdown: small worked example ≤8 lines, use a table or bulleted iteration list. Empty string when is_complex=true.",
   "example": {{
-    "input_label": "Short example input string, e.g. nums = [-1,0,1,2,-1,-4]",
+    "input_label": "ONLY when is_complex=true. Short input, e.g. nums = [0,3,7,2,5,8,4,6,0,1]. Empty object when is_complex=false.",
     "steps": [
       {{
-        "title": "Short step title (e.g. After sorting / i=0 outer loop / Found triplet)",
-        "array": [list of numbers or strings representing state — keep to ≤8 elements],
+        "title": "Short step title",
+        "array": [list of ≤8 values representing state],
         "pointers": {{"pointer_name": index_integer}},
-        "note": "One line: what happened this step and why (≤65 chars)"
+        "note": "≤65 chars: what happened and why"
       }}
     ]
   }}
 }}
 
-Rules for example.steps:
-- 4–6 steps maximum showing the KEY state changes (not every iteration)
-- array must be actual values at that point (sorted if algorithm sorts, etc.)
-- pointers keys: use short names like i, l, r, left, right, mid, slow, fast, prev, cur
-- pointer values are 0-based array indices
-- note explains the action taken and result
-- If the algorithm doesn't use arrays (e.g. trees, strings), use array to show relevant state (chars, node values, stack contents, etc.)"""
+Decide is_complex:
+- false → hashmap lookups, single-pass counting, simple two-pointer, basic stack/queue, set membership
+- true  → backtracking, DP with non-trivial state, graph traversal, sliding window with multiple invariants, tree DP, monotonic stack/deque, union-find
 
-    result = subprocess.run(
-        ["gemini", "-p", prompt, "-o", "text"],
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        timeout=120,
-        preexec_fn=__import__('os').setsid,
-    )
+Rules for example.steps when is_complex=true:
+- 4–6 steps showing KEY state changes only
+- pointers: i, l, r, left, right, mid, slow, fast, prev, cur
+- For non-array problems (trees/graphs/strings), array holds relevant state (node values, stack contents, chars)"""
+    text = run_claude(prompt, timeout=180)
+    return parse_json_response(text)
 
-    if result.returncode != 0:
-        raise RuntimeError(f"gemini exited {result.returncode}: {result.stderr.strip()}")
+# ─── Sonnet: slim resubmit analysis ──────────────────────────────────────────
 
-    text = result.stdout.strip()
-    text = re.sub(r'^```[a-z]*\n?', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\n?```$',       '', text, flags=re.MULTILINE)
-    match = re.search(r'\{.*\}', text, re.DOTALL)
-    if not match:
-        raise ValueError(f"No JSON in gemini response: {text[:300]}")
-    return json.loads(match.group())
+def call_sonnet_append(title, difficulty, lang, problem_statement, code,
+                       heuristic_time, heuristic_space):
+    prompt = f"""Analyze this LeetCode submission. Return ONLY JSON, no markdown fences.
 
+Problem: {title} ({difficulty})
+
+Problem statement:
+{problem_statement or '(not provided)'}
+
+Submitter's code:
+```{lang}
+{code}
+```
+
+Heuristic guess (often wrong — verify from code): Time≈{heuristic_time}, Space≈{heuristic_space}.
+
+{COMPLEXITY_INSTRUCTIONS}
+
+JSON shape:
+{{
+  "my_time": "Big-O time. Exact.",
+  "my_time_why": "1-2 sentences. Reference specific loops/ops/recursion in the code.",
+  "my_space": "Big-O space. Include recursion stack if relevant.",
+  "my_space_why": "1-2 sentences. Reference what is stored.",
+  "tradeoffs": "1-2 sentences: trade-offs vs common alternatives.",
+  "improvements": "1-2 sentences: concrete suggestions."
+}}"""
+    text = run_claude(prompt, timeout=90)
+    return parse_json_response(text)
 
 # ─── Note updater ─────────────────────────────────────────────────────────────
 
-def update_note(filepath, analysis, compressed_json):
+def update_note(filepath, analysis, compressed_json, is_complex, walkthrough_md):
     with open(filepath, 'r') as f:
         content = f.read()
 
     replacements = {
-        "_AI generating complexity explanation..._": analysis.get("complexity_why", ""),
-        "_AI generating trade-off analysis..._":     analysis.get("tradeoffs", ""),
-        "_AI generating improvement suggestions..._": analysis.get("improvements", ""),
+        "_AI my time..._":     analysis.get("my_time", ""),
+        "_AI my time why..._": analysis.get("my_time_why", ""),
+        "_AI my space..._":    analysis.get("my_space", ""),
+        "_AI my space why..._": analysis.get("my_space_why", ""),
+        "_AI generating analysis..._": (
+            (analysis.get("tradeoffs", "") + "\n\n" + analysis.get("improvements", "")).strip()
+        ),
     }
     for placeholder, value in replacements.items():
         if value:
             content = content.replace(placeholder, value)
 
-    if compressed_json:
+    if is_complex:
+        walkthrough_text = "See the attached Excalidraw drawing for a step-by-step trace."
+    else:
+        walkthrough_text = walkthrough_md.strip() or "See the attached drawing."
+    content = content.replace("_AI generating walkthrough..._", walkthrough_text)
+
+    if is_complex and compressed_json:
         content = re.sub(
             r'(```compressed-json\n).*?(\n```)',
             lambda m: m.group(1) + compressed_json + m.group(2),
@@ -362,47 +465,119 @@ def log(msg):
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 def strip_leet_boilerplate(code):
-    """Remove # @leet imports block and markers injected by leetcode.nvim."""
-    # Drop everything between @leet imports start / end (inclusive)
-    code = re.sub(r'# @leet imports start.*?# @leet imports end\n?', '', code, flags=re.DOTALL)
-    # Drop @leet start / @leet end markers
-    code = re.sub(r'# @leet (start|end)\n?', '', code)
+    """Remove @leet imports block and markers injected by leetcode.nvim (py + java)."""
+    # Python-style
+    code = re.sub(r'#\s*@leet imports start.*?#\s*@leet imports end\n?', '', code, flags=re.DOTALL)
+    code = re.sub(r'#\s*@leet (start|end)\n?', '', code)
+    # Java/JS-style
+    code = re.sub(r'//\s*@leet imports start.*?//\s*@leet imports end\n?', '', code, flags=re.DOTALL)
+    code = re.sub(r'//\s*@leet (start|end)\n?', '', code)
     return code.strip()
 
 
+def call_sonnet_append(title, difficulty, lang, problem_statement, code,
+                       heuristic_time, heuristic_space):
+    """Slim prompt for repeat submissions — fills my_time/my_space + Whys."""
+    prompt = f"""Return ONLY JSON, no markdown fences.
+
+Problem: {title} ({difficulty})
+
+Problem statement:
+{problem_statement or '(not provided)'}
+
+Submitter's code:
+```{lang}
+{code}
+```
+
+Heuristic guess (often wrong, verify yourself): Time≈{heuristic_time}, Space≈{heuristic_space}.
+
+JSON shape:
+{{
+  "my_time": "Big-O time of submitter's code. Determine from the actual code, not the heuristic.",
+  "my_time_why": "1-2 sentences justifying my_time. Reference specific loops/ops/recursion.",
+  "my_space": "Big-O space of submitter's code. Include recursion stack if relevant.",
+  "my_space_why": "1-2 sentences justifying my_space. Reference what is stored."
+}}"""
+    text = run_claude(prompt, SONNET_MODEL, timeout=90)
+    return parse_json_response(text)
+
+
+def update_note_append(filepath, analysis):
+    with open(filepath, 'r') as f:
+        content = f.read()
+    for placeholder, value in {
+        "_AI my time..._":              analysis.get("my_time", ""),
+        "_AI my time why..._":          analysis.get("my_time_why", ""),
+        "_AI my space..._":             analysis.get("my_space", ""),
+        "_AI my space why..._":         analysis.get("my_space_why", ""),
+        "_AI generating analysis..._":  (
+            (analysis.get("tradeoffs", "") + "\n\n" + analysis.get("improvements", "")).strip()
+        ),
+    }.items():
+        if value:
+            content = content.replace(placeholder, value)
+    with open(filepath, 'w') as f:
+        f.write(content)
+
+
 def main():
-    data       = json.loads(sys.stdin.read())
-    title      = data.get("title", "Unknown")
-    difficulty = data.get("difficulty", "Unknown")
-    lang       = data.get("lang", "python3")
-    code       = strip_leet_boilerplate(data.get("code", ""))
-    time_c     = data.get("time_complexity", "O(?)")
-    space_c    = data.get("space_complexity", "O(?)")
-    filepath   = data.get("filepath", "")
+    data              = json.loads(sys.stdin.read())
+    title             = data.get("title", "Unknown")
+    difficulty        = data.get("difficulty", "Unknown")
+    lang              = data.get("lang", "java")
+    code              = strip_leet_boilerplate(data.get("code", ""))
+    time_c            = data.get("time_complexity", "O(?)")
+    space_c           = data.get("space_complexity", "O(?)")
+    filepath          = data.get("filepath", "")
+    mode              = data.get("mode", "full")
+    problem_statement = strip_html(data.get("problem_statement", ""))
 
     if not filepath:
         log("[lc_ai] No filepath provided")
         sys.exit(1)
 
-    log(f"[lc_ai] Analyzing {title} via Gemini...")
+    if mode == "append":
+        log(f"[lc_ai] Append (Sonnet) for {title}...")
+        try:
+            analysis = call_sonnet_append(title, difficulty, lang, problem_statement,
+                                          code, time_c, space_c)
+        except QuotaExceeded as e:
+            log(f"[lc_ai] Quota (append): {e}")
+            sys.exit(2)
+        except Exception as e:
+            log(f"[lc_ai] Error (append): {e}")
+            sys.exit(1)
+        update_note_append(filepath, analysis)
+        log(f"[lc_ai] Append note updated: {filepath}")
+        return
 
+    log(f"[lc_ai] Full analysis (Sonnet) for {title} [{difficulty}]...")
     try:
-        analysis = call_gemini(title, difficulty, lang, code, time_c, space_c)
+        analysis = call_sonnet_full(title, difficulty, lang, problem_statement,
+                                    code, time_c, space_c)
+    except QuotaExceeded as e:
+        log(f"[lc_ai] Quota: {e}")
+        sys.exit(2)
     except Exception as e:
-        log(f"[lc_ai] Gemini error: {e}")
+        log(f"[lc_ai] Error: {e}")
         sys.exit(1)
 
-    example = analysis.get("example")
-    if example and example.get("steps"):
+    is_complex     = bool(analysis.get("is_complex", False))
+    walkthrough_md = analysis.get("walkthrough_md", "") or ""
+    example        = analysis.get("example") or {}
+
+    scene = None
+    if is_complex and example.get("steps"):
         scene = build_trace_diagram(example)
-        log(f"[lc_ai] Diagram: {len(example['steps'])} trace steps, "
-            f"{len(scene['elements'])} elements")
+        log(f"[lc_ai] Diagram: {len(example['steps'])} steps, {len(scene['elements'])} elements")
+    elif is_complex:
+        log("[lc_ai] is_complex=true but no steps — skipping diagram")
     else:
-        log("[lc_ai] No example trace in response, skipping diagram")
-        scene = None
+        log("[lc_ai] Simple → markdown walkthrough")
 
     compressed = compress_to_excalidraw(scene) if scene else None
-    update_note(filepath, analysis, compressed)
+    update_note(filepath, analysis, compressed, is_complex, walkthrough_md)
     log(f"[lc_ai] Note updated: {filepath}")
 
 

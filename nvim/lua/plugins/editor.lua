@@ -32,6 +32,14 @@ return {
       },
       { '<leader>fr', '<cmd>Telescope lsp_references<cr>', desc = 'Find references' },
       { '<leader>fd', desc = 'Find directory' },
+      {
+        '<leader>fa',
+        function()
+          require('telescope.builtin').find_files({ no_ignore = true, hidden = true })
+        end,
+        desc = 'Find files (incl. gitignored)',
+      },
+      { '<leader>gs', '<cmd>Telescope git_status<cr>', desc = 'Git changed files' },
       { '<leader>lg', '<cmd>Telescope live_grep<cr>',    desc = 'Live grep in cwd' },
       {
         '<leader>/',
@@ -91,12 +99,24 @@ return {
       local vimgrep_arguments = vim.fn.executable('rg') == 1 and {
         'rg', '--color=never', '--no-heading', '--with-filename',
         '--line-number', '--column', '--smart-case',
-        '--hidden', '--glob=!.git/',
+        '--hidden',
+        '--glob=!.git/',
+        '--glob=!node_modules/',
+        '--glob=!Library/',
+        '--glob=!.gradle/',
+        '--glob=!target/',
+        '--glob=!dist/',
+        '--glob=!build/',
+        '--glob=!*.class',
       } or nil
 
       require('telescope').setup({
         defaults = {
           vimgrep_arguments = vimgrep_arguments,
+          file_ignore_patterns = {
+            'node_modules/', '%.git/', 'Library/', '%.gradle/', 'target/',
+            'dist/', 'build/', '%.class$', '%.DS_Store',
+          },
           path_display = function(_, path)
             local tail = vim.fn.fnamemodify(path, ':t')
             local parent = vim.fn.fnamemodify(path, ':h')
@@ -125,6 +145,17 @@ return {
               n = {
                 ['dd'] = actions.delete_buffer,
               },
+            },
+          },
+          -- Diffs can run long; a tall vertical layout gives the preview far
+          -- more lines than the default 50/50 horizontal split. <C-u>/<C-d>
+          -- (default Telescope bindings) still scroll the preview if a diff
+          -- overflows even that.
+          git_status = {
+            layout_strategy = 'vertical',
+            layout_config = {
+              height         = 0.95,
+              preview_height = 0.7,
             },
           },
         },
@@ -157,6 +188,16 @@ return {
         require('core.telescope_help').show()
       end, { desc = 'Telescope help' })
       vim.keymap.set('n', '<leader>fr', b.lsp_references,    { desc = 'Find references' })
+
+      -- ── Find files, bypassing .gitignore (still skips node_modules/, etc.
+      -- via file_ignore_patterns above) — catches untracked files that
+      -- <leader>ff can't see ────────────────────────────────────────────────
+      vim.keymap.set('n', '<leader>fa', function()
+        b.find_files({ no_ignore = true, hidden = true })
+      end, { desc = 'Find files (incl. gitignored)' })
+
+      -- ── Git changed files — preview shows the diff, <CR> opens the file ──
+      vim.keymap.set('n', '<leader>gs', b.git_status, { desc = 'Git changed files' })
 
       -- ── Live grep in the current working directory ────────────────────────
       vim.keymap.set('n', '<leader>lg', function()
@@ -264,6 +305,31 @@ return {
       { 'gbc', mode = 'n' },
     },
     opts = {},
+  },
+
+  -- --------------------------------------------------------------------------
+  -- nvim-autopairs — auto-close brackets, quotes, treesitter-aware
+  -- --------------------------------------------------------------------------
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require('nvim-autopairs').setup({
+        check_ts = true,
+        ts_config = {
+          lua = { 'string' },
+          javascript = { 'template_string' },
+        },
+        fast_wrap = {},
+      })
+
+      local cmp_ok, cmp = pcall(require, 'cmp')
+      if cmp_ok then
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+      end
+    end,
   },
 
 }

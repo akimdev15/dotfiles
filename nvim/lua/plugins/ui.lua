@@ -4,50 +4,40 @@
 return {
 
   -- --------------------------------------------------------------------------
-  -- Dracula colorscheme
+  -- mini.icons — faster devicons (cached lookups, ~10× faster).
+  -- Mocks nvim-web-devicons so neo-tree/lualine/telescope keep their visuals
+  -- with zero config change. Loaded early (priority > colorscheme) so the
+  -- mock is in place before any consumer plugin reads icons.
   -- --------------------------------------------------------------------------
   {
-    'Mofiqul/dracula.nvim',
-    priority = 1000,
+    'echasnovski/mini.icons',
+    lazy     = false,
+    priority = 1100,
     config = function()
-      require('dracula').setup({
-        transparent_bg = true,
-        italic_comment = true,
-      })
-      vim.cmd.colorscheme('dracula')
+      require('mini.icons').setup()
+      MiniIcons.mock_nvim_web_devicons()
     end,
   },
 
   -- --------------------------------------------------------------------------
-  -- Cyberdream colorscheme (commented out)
+  -- Nightfox (carbonfox) colorscheme
   -- --------------------------------------------------------------------------
-  -- {
-  --   'scottmckendry/cyberdream.nvim',
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     require('cyberdream').setup({
-  --       transparent = true,
-  --       italic_comments = true,
-  --       hide_fillchars = true,
-  --       borderless_pickers = true,
-  --       terminal_colors = true,
-  --       extensions = {
-  --         telescope = true,
-  --         notify = true,
-  --         mini = true,
-  --         treesitter = true,
-  --         treesittercontext = true,
-  --         whichkey = true,
-  --         lazy = true,
-  --         cmp = true,
-  --         gitsigns = true,
-  --         indentblankline = true,
-  --       },
-  --     })
-  --     vim.cmd.colorscheme('cyberdream')
-  --   end,
-  -- },
+  {
+    'EdenEast/nightfox.nvim',
+    priority = 1000,
+    config = function()
+      require('nightfox').setup({
+        options = {
+          transparent = false,
+          terminal_colors = true,
+          styles = {
+            comments = 'italic',
+          },
+        },
+      })
+      vim.cmd.colorscheme('carbonfox')
+    end,
+  },
 
   -- --------------------------------------------------------------------------
   -- Statusline — lualine.nvim
@@ -101,7 +91,7 @@ return {
 
       require('lualine').setup({
         options = {
-          theme                = 'dracula',
+          theme                = 'carbonfox',
           icons_enabled        = true,
           globalstatus         = true,                              -- single shared statusline
           component_separators = { left = '│', right = '│' },

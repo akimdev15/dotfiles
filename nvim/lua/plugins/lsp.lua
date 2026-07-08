@@ -33,6 +33,7 @@ return {
 
       local tools = {
         -- LSP servers
+        'gopls',           -- Go
         'jdtls',           -- Java
         'pyright',         -- Python
         'typescript-language-server',
@@ -65,6 +66,7 @@ return {
   {
     'neovim/nvim-lspconfig',
     ft = {
+      'go',
       'javascript',
       'javascriptreact',
       'lua',
@@ -100,6 +102,12 @@ return {
           map('<leader>ws', telescope('lsp_dynamic_workspace_symbols'), '[W]orkspace [S]ymbols')
           map('<leader>rn', vim.lsp.buf.rename,                         '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action,                    '[C]ode [A]ction')
+          map('<leader>oi', function()
+            vim.lsp.buf.code_action({
+              context = { only = { 'source.organizeImports' }, diagnostics = {} },
+              apply   = true,
+            })
+          end, '[O]rganize [I]mports')
           map('<C-s>', function()
             vim.lsp.buf.signature_help({ border = 'rounded' })
           end, 'Signature Help')
@@ -145,6 +153,7 @@ return {
       -- ── Servers to auto-install and configure ─────────────────────────────
       -- Add or remove entries here to manage which LSPs are active.
       local servers = {
+        gopls   = {},
         pyright = {},
         ts_ls   = {},
         lua_ls  = {

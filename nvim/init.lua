@@ -39,6 +39,7 @@ require('lazy').setup({
   { import = 'plugins.java' },     -- Java LSP via nvim-jdtls
   { import = 'plugins.format' },   -- conform.nvim — format on save
   { import = 'plugins.tools' },    -- neo-tree, tmux-navigator
+  { import = 'plugins.git' },      -- gitsigns — gutter signs for uncommitted changes
   { import = 'plugins.leetcode' }, -- LeetCode + Obsidian vault integration
   { import = 'plugins.copilot' }, -- GitHub Copilot ghost-text (comment out to remove)
   { import = 'plugins.lazygit' }, -- Lazygit floating window

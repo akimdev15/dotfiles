@@ -26,6 +26,7 @@ return {
   --   P           float preview of file under cursor
   --   R           refresh tree
   --   q           close
+  --   > / <       widen / narrow sidebar (5 cols)
   -- --------------------------------------------------------------------------
   {
     'nvim-neo-tree/neo-tree.nvim',
@@ -74,8 +75,8 @@ return {
       default_component_configs = {
         indent = {
           indent_size    = 2,
-          with_markers   = true,
-          with_expanders = true,
+          with_markers   = false, -- skip per-row marker walk on redraw
+          with_expanders = false, -- skip per-row expander walk on redraw
         },
         icon = {
           folder_closed = '',
@@ -99,7 +100,7 @@ return {
       },
       window = {
         position = 'left',
-        width    = 35,
+        width    = 40,
         mappings = {
           ['<space>']        = 'none',       -- don't let neo-tree intercept <leader>
           -- nowait = true: fire immediately without waiting for any chord timeout
@@ -113,21 +114,32 @@ return {
           ['s']       = 'open_vsplit',
           ['S']       = 'open_split',
           ['t']       = 'open_tabnew',
+          ['>']       = function() vim.cmd('vertical resize +5') end,
+          ['<']       = function() vim.cmd('vertical resize -5') end,
         },
       },
       filesystem = {
         filtered_items = {
           hide_dotfiles   = false,
-          hide_gitignored = true,
+          -- Was true: forked `git check-ignore` per entry on every expand
+          -- (~5-10ms × N entries on macOS = 250-500ms perceived lag on `o`).
+          -- never_show regex below gives the same visual hiding with zero subprocess.
+          hide_gitignored = false,
+          never_show_by_pattern = {
+            '^node_modules$', '^%.git$', '^dist$', '^build$',
+            '^target$', '^%.next$', '^__pycache__$', '^%.venv$', '^venv$',
+          },
         },
         -- Off by default: when enabled, every BufEnter rescans the tree to reveal
         -- the open file (fs_scan + git status). That makes neo-tree opens feel very slow.
         hijack_netrw_behavior  = 'disabled',    -- don't auto-open on nvim .
         follow_current_file    = { enabled = false, leave_dirs_open = true },
         use_libuv_file_watcher = false,   -- macOS: libuv watchers on expand = very slow
-        -- 'always' overrides the hardcoded async=false in toggle_directory, making
-        -- folder expands non-blocking. 'auto' only applies when nil is passed.
-        async_directory_scan   = 'always',
+        -- Counter-intuitive: 'never' paints expanded children in the SAME frame
+        -- as the keypress. 'always' adds an extra render cycle (defer → empty
+        -- frame → scan → second frame) that feels laggy on small/shallow dirs.
+        -- Combined with scan_mode='shallow', sync stays sub-millisecond.
+        async_directory_scan   = 'never',
         scan_mode              = 'shallow', -- only scan one level deep at a time
       },
     },

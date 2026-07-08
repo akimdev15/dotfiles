@@ -19,6 +19,7 @@ vim.opt.clipboard = 'unnamedplus'  -- sync yank/paste with the OS clipboard
 -- UI / Display
 -- ============================================================================
 vim.opt.showmode     = false  -- mode is already shown by the statusline
+vim.opt.cmdheight    = 0      -- hide cmdline when idle; expands automatically when typing : or showing messages
 vim.opt.cursorline   = true   -- highlight the current line
 vim.opt.signcolumn   = 'yes'  -- always show the sign column (prevents layout shift)
 vim.opt.scrolloff    = 10     -- keep ≥10 lines visible above/below the cursor
@@ -57,6 +58,10 @@ vim.opt.splitbelow = true  -- new horizontal split opens below
 vim.opt.updatetime = 400   -- ms before CursorHold fires; 250 is too aggressive on slow LSPs
 vim.opt.timeoutlen = 300   -- keep mapped keys responsive without a 1s wait
 vim.opt.ttimeoutlen = 10   -- ms to wait for terminal key/mouse escape sequences
+vim.opt.synmaxcol  = 240   -- skip syntax/regex highlight past col 240 (minified/log files)
+vim.opt.redrawtime = 1500  -- bail on regex highlight after 1.5s instead of 2s default
+-- Trim shada writes: !,'500=marks for 500 files, <50=50 lines/reg, s10=10KB/item, h=no hlsearch
+vim.opt.shada      = "!,'500,<50,s10,h"
 
 -- ============================================================================
 -- Files & Persistence

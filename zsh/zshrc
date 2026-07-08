@@ -24,6 +24,9 @@ done
 # ── fzf ──────────────────────────────────────────────────────────────────────
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# alt+c directory search: skip noisy dirs
+export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git --exclude node_modules --exclude Library --exclude .gradle --exclude target --exclude dist --exclude build'
+
 # ── Per-machine config (NOT in dotfiles) ─────────────────────────────────────
 # Copy zsh/local.zsh.example → ~/.zshrc.local and customize per machine.
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
