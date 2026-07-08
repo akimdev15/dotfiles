@@ -7,6 +7,12 @@
 -- Manual format any time:  :lua require('conform').format()
 -- Skip auto-format once:   :w   →  :ConformDisable  /  :ConformEnable
 --
+-- Java format-on-save is OFF by default (google-java-format's AOSP style can
+-- rewrite files unexpectedly). Toggle for the current session with
+-- <leader>jf, or flip cfg.java_format_on_save in lua/core/config.lua to
+-- change the default. `:lua require('conform').format()` still formats Java
+-- manually regardless of this setting.
+--
 -- Tool selection is driven by lua/core/config.lua flags. See that file to
 -- toggle Rust / daemon formatters on or off — output stays identical for
 -- defaulted-on flags (prettierd, taplo).
@@ -43,6 +49,10 @@ return {
         -- Toggle off with :let g:disable_autoformat = 1  (global)
         --             or :let b:disable_autoformat = 1  (buffer)
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+          return
+        end
+        -- Java is opt-in (see cfg.java_format_on_save / <leader>jf below).
+        if vim.bo[bufnr].filetype == 'java' and not cfg.java_format_on_save then
           return
         end
         return { timeout_ms = 1500, lsp_format = 'fallback' }
@@ -92,6 +102,20 @@ return {
         vim.b.disable_autoformat = false
         vim.g.disable_autoformat = false
       end, { desc = 'Re-enable autoformat' })
+
+      -- Session-only toggle for Java format-on-save (default: disabled).
+      -- Mutates the shared cfg table in memory only — nothing is written to
+      -- disk, so restarting nvim always goes back to cfg.java_format_on_save
+      -- in lua/core/config.lua.
+      vim.keymap.set('n', '<leader>jf', function()
+        cfg.java_format_on_save = not cfg.java_format_on_save
+        vim.notify(
+          'Java format-on-save '
+            .. (cfg.java_format_on_save and 'ENABLED' or 'DISABLED')
+            .. ' for this session (restart resets to the config.lua default: disabled)',
+          vim.log.levels.INFO
+        )
+      end, { desc = 'Toggle Java format-on-save' })
     end,
   },
 }

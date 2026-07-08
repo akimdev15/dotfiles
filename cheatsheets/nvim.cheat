@@ -303,6 +303,9 @@ gbc  (normal)   gb  (visual)
 # Re-enable autoformat
 :FormatEnable
 
+# Toggle Java format-on-save (off by default; session only, resets on restart)
+<leader>jf
+
 % nvim, statusline (lualine)
 
 # Statusline layout (left → right)
@@ -344,3 +347,6 @@ use_biome = false
 
 # Opt-in: dprint replaces prettier for JSON/MD/YAML
 use_dprint = false
+
+# Java format-on-save (off by default; toggle at runtime with <leader>jf)
+java_format_on_save = false
