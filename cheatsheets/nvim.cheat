@@ -73,6 +73,12 @@ gl
 # Find buffer
 <leader>fb
 
+# Find ALL files (bypasses .gitignore, catches untracked files ff can't see)
+<leader>fa
+
+# Git changed files (preview diff on the right, Enter opens the file)
+<leader>gs
+
 # Live grep in cwd
 <leader>fg  or  <leader>lg
 
@@ -114,6 +120,44 @@ Ctrl-j
 
 # Inside Telescope: move up
 Ctrl-k
+
+# Inside Telescope: scroll preview down/up (for long diffs/files)
+Ctrl-d  /  Ctrl-u
+
+% nvim, git (gitsigns gutter + LazyGit)
+
+# Open LazyGit (full TUI: stage, commit, branches; best for big diffs)
+<leader>gg
+
+# Jump to next changed hunk
+]c
+
+# Jump to previous changed hunk
+[c
+
+# Preview hunk diff in a floating popup (stay in place)
+<leader>hp
+
+# Stage hunk under cursor (visual mode: stage only selected lines)
+<leader>hs
+
+# Reset/discard hunk under cursor (visual mode: selected lines only)
+<leader>hr
+
+# Stage the entire current buffer
+<leader>hS
+
+# Reset/discard all changes in the current buffer
+<leader>hR
+
+# Blame current line (full popup: author, date, commit message)
+<leader>hb
+
+# Toggle inline blame (virtual text at end of line)
+<leader>gb
+
+# Hunk text object — e.g. dih / yih / vih
+ih
 
 % nvim, file explorer (neo-tree)
 

@@ -147,15 +147,19 @@ return {
               },
             },
           },
-          -- Diffs can run long; a tall vertical layout gives the preview far
-          -- more lines than the default 50/50 horizontal split. <C-u>/<C-d>
-          -- (default Telescope bindings) still scroll the preview if a diff
-          -- overflows even that.
+          -- Keep the file list on the left and the diff on the right (like
+          -- the default), just bigger: preview_cutoff = 1 forces the preview
+          -- to always render (Telescope hides it below a size threshold —
+          -- easy to hit in a small terminal/tmux pane), and a wider window
+          -- gives long diff lines much more room. <C-u>/<C-d> (default
+          -- Telescope bindings) scroll the preview if a diff still overflows.
           git_status = {
-            layout_strategy = 'vertical',
+            layout_strategy = 'horizontal',
             layout_config = {
-              height         = 0.95,
-              preview_height = 0.7,
+              width         = 0.95,
+              height        = 0.95,
+              preview_width = 0.62,
+              preview_cutoff = 1,
             },
           },
         },
