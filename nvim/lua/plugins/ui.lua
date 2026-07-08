@@ -36,6 +36,30 @@ return {
         },
       })
       vim.cmd.colorscheme('carbonfox')
+
+      -- Telescope's git_status picker (<leader>gs) ships with no highlights
+      -- for its add/change/delete/untracked columns, so carbonfox renders
+      -- them as plain white text. Borrow the same hues carbonfox already
+      -- uses for `:diff`/gitsigns so the left-hand file list stays legible
+      -- and consistent with the rest of the editor.
+      local function fg_of(group, fallback)
+        local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })
+        return (ok and hl and hl.fg) or fallback
+      end
+
+      local function set_git_status_highlights()
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffAdd',
+          { fg = fg_of('diffAdded', 0x25be6a), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffChange',
+          { fg = fg_of('diffChanged', 0x08bdba), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffDelete',
+          { fg = fg_of('diffRemoved', 0xee5396), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffUntracked',
+          { fg = fg_of('diffFile', 0x78a9ff), bold = true })
+      end
+
+      set_git_status_highlights()
+      vim.api.nvim_create_autocmd('ColorScheme', { callback = set_git_status_highlights })
     end,
   },
 

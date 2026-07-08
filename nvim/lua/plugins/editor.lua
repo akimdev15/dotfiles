@@ -161,6 +161,9 @@ return {
               preview_width = 0.62,
               preview_cutoff = 1,
             },
+            -- Colored status glyph + filetype devicon per entry instead of
+            -- the stock plain "~ path" line — see core/telescope_git_status.lua.
+            entry_maker = require('core.telescope_git_status').entry_maker({}),
           },
         },
         extensions = {
