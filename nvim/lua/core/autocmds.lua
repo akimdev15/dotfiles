@@ -1,3 +1,5 @@
+local palette = require('core.palette')
+
 -- ============================================================================
 -- Explicit filetype mappings for files Neovim misses
 -- ============================================================================
@@ -49,25 +51,23 @@ vim.api.nvim_create_autocmd('ColorScheme', {
   group = vim.api.nvim_create_augroup('visible-borders', { clear = true }),
   callback = function()
     -- Set the border color to Dracula's purple for high visibility
-    vim.api.nvim_set_hl(0, 'FloatBorder', { fg = '#bd93f9' })
+    vim.api.nvim_set_hl(0, 'FloatBorder', { fg = palette.purple })
   end,
 })
 
 -- ============================================================================
 -- UI: High-contrast Visual-mode selection
--- Carbonfox default selection bg is hard to spot on the near-black background.
--- Override to a brighter purple-blue so highlights pop instantly.
--- Swap the hex below to taste:
---   #44475a  Dracula default        (subtle)
---   #3e4d63  steel blue             (medium)
---   #4d5277  brighter purple-blue   (current — high contrast)
---   #6272a4  Dracula comment        (very high contrast)
+-- Dracula's default selection bg (palette.selection) is hard to spot on the
+-- near-black background. Override to a brighter purple-blue so highlights
+-- pop instantly. To try a different shade, swap `palette.visual_selection`
+-- for another color from core/palette.lua (e.g. `palette.comment` for even
+-- higher contrast).
 -- ============================================================================
 vim.api.nvim_create_autocmd('ColorScheme', {
   desc  = 'High-contrast Visual selection',
   group = vim.api.nvim_create_augroup('visible-visual', { clear = true }),
   callback = function()
-    vim.api.nvim_set_hl(0, 'Visual', { bg = '#4d5277', bold = true })
+    vim.api.nvim_set_hl(0, 'Visual', { bg = palette.visual_selection, bold = true })
   end,
 })
 

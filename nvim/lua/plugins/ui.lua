@@ -1,6 +1,8 @@
 -- ============================================================================
 -- UI: colorscheme and statusline
 -- ============================================================================
+local palette = require('core.palette')
+
 return {
 
   -- --------------------------------------------------------------------------
@@ -11,7 +13,7 @@ return {
   -- --------------------------------------------------------------------------
   {
     'echasnovski/mini.icons',
-    lazy     = false,
+    lazy = false,
     priority = 1100,
     config = function()
       require('mini.icons').setup()
@@ -20,42 +22,34 @@ return {
   },
 
   -- --------------------------------------------------------------------------
-  -- Nightfox (carbonfox) colorscheme
+  -- Dracula colorscheme
   -- --------------------------------------------------------------------------
   {
-    'EdenEast/nightfox.nvim',
+    'Mofiqul/dracula.nvim',
     priority = 1000,
     config = function()
-      require('nightfox').setup({
-        options = {
-          transparent = false,
-          terminal_colors = true,
-          styles = {
-            comments = 'italic',
-          },
-        },
-      })
-      vim.cmd.colorscheme('carbonfox')
+      require('dracula').setup {
+        transparent_bg = false,
+        terminal_colors = true,
+        italic_comment = true,
+      }
+      vim.cmd.colorscheme 'dracula'
 
       -- Telescope's git_status picker (<leader>gs) ships with no highlights
-      -- for its add/change/delete/untracked columns, so carbonfox renders
-      -- them as plain white text. Borrow the same hues carbonfox already
-      -- uses for `:diff`/gitsigns so the left-hand file list stays legible
-      -- and consistent with the rest of the editor.
+      -- for its add/change/delete/untracked columns, so it renders them as
+      -- plain white text. Borrow the same hues Dracula already uses for
+      -- `:diff`/gitsigns so the left-hand file list stays legible and
+      -- consistent with the rest of the editor.
       local function fg_of(group, fallback)
         local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })
         return (ok and hl and hl.fg) or fallback
       end
 
       local function set_git_status_highlights()
-        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffAdd',
-          { fg = fg_of('diffAdded', 0x25be6a), bold = true })
-        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffChange',
-          { fg = fg_of('diffChanged', 0x08bdba), bold = true })
-        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffDelete',
-          { fg = fg_of('diffRemoved', 0xee5396), bold = true })
-        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffUntracked',
-          { fg = fg_of('diffFile', 0x78a9ff), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffAdd', { fg = fg_of('diffAdded', 0x25be6a), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffChange', { fg = fg_of('diffChanged', 0x08bdba), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffDelete', { fg = fg_of('diffRemoved', 0xee5396), bold = true })
+        vim.api.nvim_set_hl(0, 'TelescopeResultsDiffUntracked', { fg = fg_of('diffFile', 0x78a9ff), bold = true })
       end
 
       set_git_status_highlights()
@@ -85,20 +79,28 @@ return {
       -- ── Custom components ─────────────────────────────────────────────────
       local function macro_recording()
         local reg = vim.fn.reg_recording()
-        if reg == '' then return '' end
+        if reg == '' then
+          return ''
+        end
         return ' recording @' .. reg
       end
 
       local function copilot_status()
         local ok, client = pcall(require, 'copilot.client')
-        if not ok then return '' end
-        if client.is_disabled() then return ' ' end -- disabled icon
-        return ' '                                  -- enabled icon
+        if not ok then
+          return ''
+        end
+        if client.is_disabled() then
+          return ' '
+        end -- disabled icon
+        return ' ' -- enabled icon
       end
 
       local function lsp_clients()
-        local clients = vim.lsp.get_clients({ bufnr = 0 })
-        if #clients == 0 then return '' end
+        local clients = vim.lsp.get_clients { bufnr = 0 }
+        if #clients == 0 then
+          return ''
+        end
         local names = {}
         for _, c in ipairs(clients) do
           table.insert(names, c.name)
@@ -107,20 +109,24 @@ return {
       end
 
       local function search_count()
-        if vim.v.hlsearch == 0 then return '' end
+        if vim.v.hlsearch == 0 then
+          return ''
+        end
         local ok, result = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 50 })
-        if not ok or not result or result.total == 0 then return '' end
+        if not ok or not result or result.total == 0 then
+          return ''
+        end
         return string.format(' %d/%d', result.current, result.total)
       end
 
-      require('lualine').setup({
+      require('lualine').setup {
         options = {
-          theme                = 'carbonfox',
-          icons_enabled        = true,
-          globalstatus         = true,                              -- single shared statusline
+          theme = 'auto', -- derives from the active colorscheme; no separate theme to swap
+          icons_enabled = true,
+          globalstatus = true, -- single shared statusline
           component_separators = { left = '│', right = '│' },
-          section_separators   = { left = '', right = '' },
-          disabled_filetypes   = {
+          section_separators = { left = '', right = '' },
+          disabled_filetypes = {
             statusline = { 'neo-tree', 'alpha', 'dashboard', 'TelescopePrompt' },
           },
           refresh = { statusline = 250, tabline = 500, winbar = 500 },
@@ -134,11 +140,11 @@ return {
           lualine_c = {
             {
               'filename',
-              path    = 1,  -- relative path
+              path = 1, -- relative path
               symbols = { modified = ' ●', readonly = ' ', unnamed = '[No Name]' },
             },
-            { search_count,    color = { fg = '#f1fa8c' } },
-            { macro_recording, color = { fg = '#ff5555', gui = 'bold' } },
+            { search_count, color = { fg = palette.yellow } },
+            { macro_recording, color = { fg = palette.red, gui = 'bold' } },
           },
           lualine_x = {
             {
@@ -146,8 +152,8 @@ return {
               sources = { 'nvim_diagnostic' },
               symbols = { error = ' ', warn = ' ', info = ' ', hint = ' ' },
             },
-            { copilot_status, color = { fg = '#50fa7b' } },
-            { lsp_clients,    color = { fg = '#8be9fd' } },
+            { copilot_status, color = { fg = palette.green } },
+            { lsp_clients, color = { fg = palette.cyan } },
             'filetype',
           },
           lualine_y = { 'encoding', 'progress' },
@@ -162,8 +168,7 @@ return {
           lualine_z = {},
         },
         extensions = { 'neo-tree', 'lazy', 'mason', 'quickfix', 'fugitive' },
-      })
+      }
     end,
   },
-
 }
