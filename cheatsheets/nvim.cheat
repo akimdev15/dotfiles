@@ -65,6 +65,23 @@ gl
 # Workspace symbols
 <leader>ws
 
+% nvim, java (jdtls)
+
+# Organize imports
+<leader>oi
+
+# Update jdtls project config (fixes unresolved 3rd-party imports after a pom.xml change or Gradle-to-Maven conversion; same as :JdtUpdateConfig)
+<leader>ju
+
+# Generate sources (Avro + annotation processors) then refresh jdtls
+<leader>jg
+
+# Toggle Java format-on-save (off by default, session only)
+<leader>jf
+
+# Note: pom.xml saves auto-run the config update, so you rarely need <leader>ju by hand
+saved pom.xml -> auto refresh
+
 % nvim, telescope
 
 # Find files

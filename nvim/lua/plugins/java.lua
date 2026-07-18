@@ -57,6 +57,34 @@ return {
 
         vim.keymap.set('n', '<leader>oi', jdtls.organize_imports,
           { buffer = true, desc = '[O]rganize [I]mports' })
+
+        -- Re-resolve the Maven or Gradle classpath into the jdtls workspace.
+        -- Needed after editing pom.xml to add a dependency, or when the workspace
+        -- goes stale, for example after a Gradle to Maven conversion, which shows
+        -- up as third party imports failing to resolve while your own packages are
+        -- fine. Same effect as the :JdtUpdateConfig command.
+        vim.keymap.set('n', '<leader>ju', function()
+          jdtls.update_project_config()
+          vim.notify('jdtls: project config updated', vim.log.levels.INFO)
+        end, { buffer = true, desc = '[J]dtls [U]pdate project config' })
+
+        -- Run the build's generate-sources phase, which produces the Avro Java
+        -- types and any annotation processor output, then refresh jdtls so the
+        -- generated classes resolve without a red import.
+        local mvn = vim.fn.filereadable(root .. '/mvnw') == 1 and (root .. '/mvnw') or 'mvn'
+        vim.keymap.set('n', '<leader>jg', function()
+          vim.notify('maven: generate-sources running', vim.log.levels.INFO)
+          vim.system({ mvn, '-q', 'generate-sources' }, { cwd = root }, function(obj)
+            vim.schedule(function()
+              if obj.code == 0 then
+                jdtls.update_project_config()
+                vim.notify('maven: generate-sources done, jdtls refreshed', vim.log.levels.INFO)
+              else
+                vim.notify('maven generate-sources failed\n' .. (obj.stderr or ''), vim.log.levels.ERROR)
+              end
+            end)
+          end)
+        end, { buffer = true, desc = '[J]ava [G]enerate sources' })
       end
 
       vim.api.nvim_create_autocmd('FileType', {
@@ -104,6 +132,19 @@ return {
       vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
         pattern  = '*.java',
         callback = scaffold_java,
+      })
+
+      -- Auto re-resolve the classpath when a build file is saved, so a newly
+      -- added dependency resolves without manually running <leader>ju. Only fires
+      -- when a jdtls client is already running for the session.
+      vim.api.nvim_create_autocmd('BufWritePost', {
+        pattern = { 'pom.xml', 'build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts' },
+        callback = function()
+          if #vim.lsp.get_clients({ name = 'jdtls' }) > 0 then
+            require('jdtls').update_project_config()
+            vim.notify('jdtls: project config updated after build file save', vim.log.levels.INFO)
+          end
+        end,
       })
     end,
   },
